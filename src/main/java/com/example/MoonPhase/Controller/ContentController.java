@@ -66,7 +66,7 @@ public class ContentController {
 
         // Agregamos variables comunes
         model.addAttribute("idUsuario", userOptional.get().getIdTipoUsuario());
-        model.addAttribute("nombreUsuario", userOptional.get().getIdTipoUsuario());
+        model.addAttribute("nombreUsuario", userOptional.get().getNombreUsuario());
 
         // Redirecciones según el tipo
         if (userOptional.get().getIdTipoUsuario() == 1) {
