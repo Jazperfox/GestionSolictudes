@@ -1,6 +1,7 @@
 package com.example.MoonPhase.Controller;
 
 import com.example.MoonPhase.Model.*;
+import com.example.MoonPhase.Service.FtpStorageService;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -11,7 +12,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Optional;
-
+import com.example.MoonPhase.Service.FtpStorageService;
+import org.springframework.web.multipart.MultipartFile;
 // import java.time.LocalDate;
 
 @Controller
@@ -23,6 +25,7 @@ public class SolicitudController {
     private final EstadoRepository estadoRepo;
     private final PrioridadRepository prioridadRepo;
     private  EmailService emailService;
+    private final FtpStorageService ftpStorageService;
 
 
     public SolicitudController(SolicitudRepository solicitudRepo,
@@ -30,14 +33,15 @@ public class SolicitudController {
                                AppUsuarioRepository usuarioRepo,
                                EstadoRepository estadoRepo,
                                PrioridadRepository prioridadRepo,
-                               EmailService emailService) {
+                               EmailService emailService,
+    FtpStorageService ftpStorageService){
         this.solicitudRepo = solicitudRepo;
         this.categoriaRepo = categoriaRepo;
         this.usuarioRepo = usuarioRepo;
         this.estadoRepo = estadoRepo;
         this.prioridadRepo = prioridadRepo;
         this.emailService = emailService;
-
+        this.ftpStorageService = ftpStorageService;
     }
 
     @GetMapping("/crear")

@@ -38,4 +38,6 @@ public class Solicitud {
     @Column(name = "correoSeguimiento", nullable = true)
     private String correo;
 
+    @Column(name = "ruta_adjunto", nullable = true)
+    private String rutaAdjunto;
 }
