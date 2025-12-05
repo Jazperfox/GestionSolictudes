@@ -70,9 +70,9 @@ public class ContentController {
 
         // Redirecciones según el tipo
         if (userOptional.get().getIdTipoUsuario() == 1) {
-            return "index";
-        } else if (userOptional.get().getIdTipoUsuario() == 2) {
             return "indexadmin";
+        } else if (userOptional.get().getIdTipoUsuario() == 2) {
+            return "index";
         } else if (userOptional.get().getIdTipoUsuario() == 3) {
             return "indexAutoriza";
         }
