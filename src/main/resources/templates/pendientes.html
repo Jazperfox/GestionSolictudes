@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<body>
+<h2>Solicitudes Sin Asignar</h2>
+
+<table class="table" border="1">
+    <thead>
+    <tr>
+        <th>ID Solicitud</th>
+        <th>ID Categoría</th>
+        <th>ID Creador</th>
+        <th>Fecha Creación</th>
+        <th>ID Estado</th>
+        <th>ID Prioridad</th>
+        <th>Asignar a:</th> </tr>
+    </thead>
+    <tbody>
+    <tr th:each="solicitud : ${pendientes}">
+        <td th:text="${solicitud.idSolicitud}">1</td>
+        <td th:text="${solicitud.idCategoriaSolicitud}">101</td>
+        <td th:text="${solicitud.idUsuarioCreacion}">5</td>
+        <td th:text="${solicitud.fechaCreacion}">2023-11-29</td>
+        <td th:text="${solicitud.idEstadoSolicitud}">1</td>
+        <td th:text="${solicitud.idPrioridad}">1</td>
+
+        <td>
+            <form th:action="@{/solicitud/asignar}" method="post">
+
+                <input type="hidden" name="idSolicitud" th:value="${solicitud.idSolicitud}" />
+
+                <select name="idUsuario" required>
+                    <option value="">-- Seleccionar Usuario --</option>
+                    <option th:each="usuario : ${usuarios}"
+                            th:value="${usuario.idUsuario}"
+                            th:text="${usuario.nombreUsuario + ' (ID: ' + usuario.idUsuario + ')'}">
+                        Nombre Usuario (ID: 1)
+                    </option>
+                </select>
+
+                <button type="submit">Asignar</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

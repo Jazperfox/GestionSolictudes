@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Home Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 10px;
+            text-align: center;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #333;
+        }
+
+        nav a {
+            color: white;
+            padding: 14px 20px;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        nav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>MoonPhase</h1>
+    <div align="right">
+        <p>
+            ¡Hola, <span th:text="${nombreUsuario}">[Nombre]</span>!
+            Tu ID de usuario es: <span th:text="${idUsuario}">[ID]</span>
+        </p>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-danger">
+                Cerrar Sesión
+            </button>
+        </form>
+    </div>
+</header>
+<nav>
+    <a href="/solicitud/autorizar">Solicitudes pendiente</a>
+<!--    <a href="#about">About</a>-->
+<!--    <a href="#services">Services</a>-->
+<!--    <a href="#contact">Contact</a>-->
+</nav>
+<main>
+<!--    <p>-->
+<!--        ¡Hola, <span th:text="${nombreUsuario}">[Nombre]</span>!-->
+<!--        Tu ID de usuario es: <span th:text="${idUsuario}">[ID]</span>-->
+<!--    </p>-->
+
+<!--    <a href="/solicitud/crear">Crear nueva solicitud</a>-->
+
+</main>
+<footer>
+    <p>MoonPhase &copy; 2025</p>
+</footer>
+</body>
+</html>

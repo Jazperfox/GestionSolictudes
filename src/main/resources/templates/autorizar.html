@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="p-3">
+
+<h2>Solicitudes a autorizar/denegar</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+    <tr>
+        <th>ID Solicitud</th>
+        <th>ID Categoria</th>
+        <th>ID Creador</th>
+        <th>Fecha Creacion</th>
+        <th>ID Estado</th>
+        <th>ID Prioridad</th>
+        <th>Acciones</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="solicitud : ${autorizar}">
+        <td th:text="${solicitud.idSolicitud}"></td>
+        <!--        <td th:text="${solicitud.idCategoriaSolicitud}"></td>-->
+        <td>
+    <span th:each="cat : ${categorias}"
+          th:if="${cat.idCategoria == solicitud.idCategoriaSolicitud}"
+          th:text="${cat.nombre}">
+    </span>
+        </td>
+        <!--        <td th:text="${solicitud.idUsuarioCreacion}"></td>-->
+        <td>
+    <span th:each="u : ${usuarios}"
+          th:if="${u.idUsuario == solicitud.idUsuarioCreacion}"
+          th:text="${u.nombreUsuario}">
+    </span>
+        </td>
+        <td th:text="${solicitud.fechaCreacion}"></td>
+
+        <td>
+    <span class="badge"
+          th:each="est : ${estados}"
+          th:if="${est.idEstado == solicitud.idEstadoSolicitud}"
+          th:text="${est.estado}"
+          th:classappend="${
+                est.estado == 'CREADA' ? ' bg-success' :
+                est.estado == 'EN PROCESO' ? ' bg-warning text-dark' :
+                ' bg-secondary'
+          }">
+    </span>
+        </td>
+        <!--        <td th:text="${solicitud.idPrioridad}"></td>-->
+        <td>
+    <span th:each="pri : ${prioridades}"
+          th:if="${pri.idPrioridad == solicitud.idPrioridad}"
+          th:text="${pri.nombrePrioridad}">
+    </span>
+        </td>
+
+        <td>
+            
+            <button class="btn btn-primary btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalActualizar"
+                    th:attr="data-id=${solicitud.idSolicitud},
+                 data-estado=${solicitud.idEstadoSolicitud}">
+                Actualizar
+            </button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+
+<div class="modal fade" id="modalActualizar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form th:action="@{/solicitud/actualizarAutorizacion}" method="post">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Actualizar Solicitud</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <!-- ID Solicitud -->
+                    <div class="mb-3">
+                        <label class="form-label">ID Solicitud</label>
+                        <input type="text" id="modalIdSolicitud" name="idSolicitud" class="form-control" readonly>
+                    </div>
+                    <!-- Nombre del estado actual -->
+                    <div class="mb-3">
+                        <label class="form-label">Estado Actual</label>
+                        <input type="text" id="modalNombreEstado" class="form-control" readonly>
+
+                        <label class="form-label">Nuevo Estado</label>
+                        <select name="idEstado" class="form-select" required>
+                            <option value="">-- Seleccionar Estado --</option>
+
+                            <!-- Estados traídos desde el backend -->
+                            <option th:each="est : ${estados}"
+                                    th:value="${est.idEstado}"
+                                    th:text="${est.estado}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Comentario -->
+                    <div class="mb-3">
+                        <label class="form-label">Comentario</label>
+                        <textarea name="comentario" class="form-control" rows="3"
+                                  placeholder="Escriba un comentario..."></textarea>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Guardar cambios</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- script para cargar los datos en el modal, y poder modificarlo -->
+<script th:inline="javascript">
+    const modal = document.getElementById('modalActualizar');
+
+    modal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget;
+
+        const idSolicitud = button.getAttribute('data-id');
+        const idEstado = button.getAttribute('data-estado');
+
+        document.getElementById('modalIdSolicitud').value = idSolicitud;
+
+        // Thymeleaf transforma esta lista en un array JS
+        const estados = /*[[${estados}]]*/ [];
+
+        const estadoActual = estados.find(e => e.idEstado == idEstado);
+
+        // Coloca el nombre del estado actual en el input
+        document.getElementById('modalNombreEstado').value =
+            estadoActual ? estadoActual.estado : "Desconocido";
+    });
+</script>
+
+</body>
+</html>

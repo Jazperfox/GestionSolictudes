@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .body {
+            margin-top: 15px;
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="header">
+        Actualización de Solicitud #<span th:text="${idSolicitud}"></span>
+    </div>
+
+    <div class="body">
+        <p><strong>Nuevo Estado:</strong> <span th:text="${estado}"></span></p>
+        <p><strong>Comentario:</strong></p>
+        <p th:text="${comentario}"></p>
+    </div>
+</div>
+
+</body>
+</html>

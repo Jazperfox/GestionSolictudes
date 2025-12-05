@@ -1,0 +1,22 @@
+<form th:action="@{/solicitud/guardar}" th:object="${solicitud}" method="post">
+
+    <label>Categoría:</label>
+
+
+<select th:field="*{idCategoriaSolicitud}" required>
+    <option value="">Seleccione...</option>
+    <th:block th:each="cat : ${categorias}">
+        <option th:value="${cat.idCategoria}" th:text="${cat.nombre}"></option>
+    </th:block>
+</select>
+
+    <label>Prioridad:</label>
+    <select th:field="*{idPrioridad}" required>
+        <option value="">Seleccione...</option>
+        <option value="1">Alta</option>
+        <option value="2">Media</option>
+        <option value="3">Baja</option>
+    </select>
+
+    <button type="submit">Guardar Solicitud</button>
+</form>

@@ -1,0 +1,17 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+ <h1>Admin</h1>
+ <p>
+  ¡Hola, <span th:text="${nombreUsuario}">[Nombre]</span>!
+  Tu ID de usuario es: <span th:text="${idUsuario}">[ID]</span>
+</p>
+<form th:action="@{/logout}" method="post">
+  <button type="submit" class="btn btn-danger">
+      Cerrar Sesión
+  </button>
+</form>
+<body>
+    <div>
+        <a class="btn btn-primary" href="/solicitud/pendientes">Pendientes</a>
+    </div>
+</body>
+</html>
