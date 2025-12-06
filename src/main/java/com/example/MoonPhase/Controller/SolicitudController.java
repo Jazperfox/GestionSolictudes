@@ -79,20 +79,23 @@ public class SolicitudController {
 
             if (solicitudGuardada.getCorreo() != null && !solicitudGuardada.getCorreo().isEmpty()) {
                 try {
-                    System.out.println(">>> INTENTANDO ENVIAR CORREO A: " + solicitudGuardada.getCorreo());
+                    // BUSCAMOS EL NOMBRE DEL ESTADO 1 EN LA BD
+                    String nombreEstado = "CREADA"; // Valor por defecto
+                    Optional<Estado> estOpt = estadoRepo.findById(1L);
+                    if (estOpt.isPresent()) {
+                        nombreEstado = estOpt.get().getEstado();
+                    }
 
                     emailService.enviarCorreoHtml(
                             solicitudGuardada.getCorreo(),
                             "Solicitud Recibida - Ticket #" + solicitudGuardada.getIdSolicitud(),
                             solicitudGuardada.getIdSolicitud(),
-                            1, // Estado 1 = Creada
+                            nombreEstado, // <--- Enviamos el nombre, no el número 1
                             "Hemos recibido tu solicitud correctamente. Un técnico la revisará pronto."
                     );
 
-                    System.out.println(">>> ¡CORREO ENVIADO CON ÉXITO!");
                 } catch (Exception e) {
                     e.printStackTrace();
-                    System.err.println(">>> ERROR ENVIANDO CORREO: " + e.getMessage());
                 }
             }
 
@@ -216,11 +219,18 @@ public class SolicitudController {
 
 
             try {
+
+                String nombreEstado = "ACTUALIZADO";
+                Optional<Estado> estOpt = estadoRepo.findById(Long.valueOf(idEstado));
+                if (estOpt.isPresent()) {
+                    nombreEstado = estOpt.get().getEstado();
+                }
+
                 emailService.enviarCorreoHtml(
                         sol.getCorreo(),
                         "Actualización de tu Solicitud #" + sol.getIdSolicitud(),
                         sol.getIdSolicitud(),
-                        idEstado,
+                        nombreEstado,
                         comentario
                 );
 
