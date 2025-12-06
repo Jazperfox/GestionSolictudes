@@ -210,15 +210,22 @@
             </div>
             <div class="user-details">
                 <h1>¡Bienvenido, <span th:text="${nombreUsuario}">Usuario</span>!</h1>
-
                 <p class="user-id">Usuario: <span th:text="${nombreUsuario}">Nombre</span> | Rol: Solicitante</p>
             </div>
         </div>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="btn-logout">
-                Cerrar Sesión
-            </button>
-        </form>
+
+        <div style="display: flex; gap: 15px; align-items: center;">
+
+            <a href="/mensajes" class="btn-chat" style="text-decoration: none; background: white; color: #667eea; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.3s;">
+                <i class="bi bi-chat-dots-fill" style="font-size: 1.3rem;"></i>
+            </a>
+
+            <form th:action="@{/logout}" method="post" style="margin: 0;">
+                <button type="submit" class="btn-logout">
+                    Cerrar Sesión
+                </button>
+            </form>
+        </div>
     </header>
 
     <main>

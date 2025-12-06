@@ -76,6 +76,26 @@ public class SolicitudController {
                 solicitudGuardada.setRutaAdjunto(rutaFtp);
                 solicitudRepo.save(solicitudGuardada);
             }
+
+            if (solicitudGuardada.getCorreo() != null && !solicitudGuardada.getCorreo().isEmpty()) {
+                try {
+                    System.out.println(">>> INTENTANDO ENVIAR CORREO A: " + solicitudGuardada.getCorreo());
+
+                    emailService.enviarCorreoHtml(
+                            solicitudGuardada.getCorreo(),
+                            "Solicitud Recibida - Ticket #" + solicitudGuardada.getIdSolicitud(),
+                            solicitudGuardada.getIdSolicitud(),
+                            1, // Estado 1 = Creada
+                            "Hemos recibido tu solicitud correctamente. Un técnico la revisará pronto."
+                    );
+
+                    System.out.println(">>> ¡CORREO ENVIADO CON ÉXITO!");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.err.println(">>> ERROR ENVIANDO CORREO: " + e.getMessage());
+                }
+            }
+
             redirectAttributes.addFlashAttribute("mensaje","Solicitud creada correctamente");
         }catch (IOException e){
             e.printStackTrace();

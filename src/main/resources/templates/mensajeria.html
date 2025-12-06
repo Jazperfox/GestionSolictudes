@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mensajería Interna</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .chat-layout {
+            width: 95%;
+            max-width: 1200px;
+            height: 90vh;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- BARRA LATERAL (CONTACTOS) --- */
+        .sidebar {
+            width: 320px;
+            background-color: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .search-box {
+            position: relative;
+            margin-top: 10px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border-radius: 20px;
+            border: 1px solid #cbd5e0;
+            background: #edf2f7;
+            outline: none;
+        }
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+        }
+
+        .contact-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: #2d3748;
+            margin-bottom: 5px;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .contact-item:hover {
+            background-color: #fff;
+            border-color: #e2e8f0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .contact-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+        }
+
+        .contact-item.active .text-muted { color: rgba(255,255,255,0.8) !important; }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: #cbd5e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: white;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .contact-item.active .avatar { background: rgba(255,255,255,0.2); }
+
+        /* --- ZONA DE CHAT --- */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .chat-header {
+            padding: 1rem 2rem;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .msg-in {
+            align-self: flex-start;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            color: #2d3748;
+            border-bottom-left-radius: 4px;
+        }
+
+        .msg-out {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg-time {
+            display: block;
+            font-size: 0.7rem;
+            margin-top: 5px;
+            text-align: right;
+            opacity: 0.7;
+        }
+
+        .input-area {
+            padding: 1.5rem;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .input-group-chat {
+            display: flex;
+            gap: 10px;
+            background: #f7fafc;
+            padding: 5px;
+            border-radius: 30px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .input-chat {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px 20px;
+            outline: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-send {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-send:hover { background: #5a67d8; transform: scale(1.05); }
+
+        .empty-chat {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #a0aec0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-layout">
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="m-0 fw-bold text-dark">Chats</h5>
+                <a href="/index" class="btn btn-sm btn-outline-secondary rounded-pill px-3">Salir</a>
+            </div>
+
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" id="buscador" placeholder="Buscar usuario..." onkeyup="filtrarUsuarios()">
+            </div>
+        </div>
+
+        <div class="contact-list" id="listaContactos">
+            <a th:each="user : ${contactos}"
+               th:href="@{/mensajes/{id}(id=${user.idUsuario})}"
+               class="contact-item"
+               th:classappend="${chatSeleccionado != null and chatSeleccionado.idUsuario == user.idUsuario} ? 'active'">
+
+                <div class="avatar" th:style="'background-color: ' + (${user.idTipoUsuario == 1} ? '#3182ce' : (${user.idTipoUsuario == 3} ? '#2f855a' : '#805ad5'))">
+                    <span th:text="${#strings.substring(user.nombreUsuario,0,1).toUpperCase()}">U</span>
+                </div>
+
+                <div class="flex-grow-1">
+                    <span class="d-block fw-bold username" th:text="${user.nombreUsuario}">Nombre</span>
+                    <small class="text-muted" th:text="${user.idTipoUsuario == 1 ? 'Admin' : (user.idTipoUsuario == 3 ? 'Asignador' : 'Solicitante')}">Rol</small>
+                </div>
+
+                <i class="bi bi-chevron-right small opacity-50"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="chat-area">
+
+        <div th:if="${chatSeleccionado != null}" class="d-flex flex-column h-100">
+            <div class="chat-header">
+                <div class="d-flex align-items-center">
+                    <div class="avatar me-3" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <span th:text="${#strings.substring(chatSeleccionado.nombreUsuario,0,1).toUpperCase()}">U</span>
+                    </div>
+                    <div>
+                        <h5 class="m-0 fw-bold" th:text="${chatSeleccionado.nombreUsuario}">Usuario</h5>
+                        <small class="text-success"><i class="bi bi-circle-fill" style="font-size: 8px;"></i> En línea</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="messages-container" id="msgContainer">
+                <div th:each="msg : ${historial}"
+                     class="message"
+                     th:classappend="${msg.remitente.idUsuario == usuarioActual.idUsuario} ? 'msg-out' : 'msg-in'">
+
+                    <span th:text="${msg.contenido}">Texto del mensaje...</span>
+                    <span class="msg-time" th:text="${#temporals.format(msg.fechaHora, 'HH:mm')}">10:00</span>
+                </div>
+
+                <div th:if="${historial.empty}" class="text-center mt-5">
+                    <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill">
+                        Inicia la conversación con <span th:text="${chatSeleccionado.nombreUsuario}"></span> 👋
+                    </span>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <form th:action="@{/mensajes/enviar}" method="post" class="input-group-chat">
+                    <input type="hidden" name="idDestinatario" th:value="${chatSeleccionado.idUsuario}">
+                    <input type="text" name="contenido" class="input-chat" placeholder="Escribe tu mensaje aquí..." required autocomplete="off" autofocus>
+                    <button type="submit" class="btn-send">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div th:unless="${chatSeleccionado != null}" class="empty-chat">
+            <div class="bg-light rounded-circle p-4 mb-3">
+                <i class="bi bi-chat-square-text text-muted" style="font-size: 3rem;"></i>
+            </div>
+            <h4 class="text-secondary fw-bold">MoonPhase Chat</h4>
+            <p class="text-muted">Selecciona un contacto para comenzar</p>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Scroll al final del chat automáticamente
+    window.onload = function() {
+        var objDiv = document.getElementById("msgContainer");
+        if(objDiv) objDiv.scrollTop = objDiv.scrollHeight;
+    }
+
+    // Buscador de usuarios simple
+    function filtrarUsuarios() {
+        var input, filter, container, a, i, txtValue;
+        input = document.getElementById("buscador");
+        filter = input.value.toUpperCase();
+        container = document.getElementById("listaContactos");
+        a = container.getElementsByClassName("contact-item");
+
+        for (i = 0; i < a.length; i++) {
+            txtValue = a[i].getElementsByClassName("username")[0].textContent;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                a[i].style.display = "flex";
+            } else {
+                a[i].style.display = "none";
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

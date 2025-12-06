@@ -1,8 +1,10 @@
 package com.example.MoonPhase.Controller;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-import com.example.MoonPhase.Model.*;
 import com.example.MoonPhase.Repository.AppUsuarioRepository;
 import com.example.MoonPhase.Repository.CategoriaSolicitudRepository;
 import com.example.MoonPhase.Repository.PrioridadRepository;
@@ -11,18 +13,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+// IMPORTANTE: Tus repositorios están en el paquete Model según tus archivos
+import com.example.MoonPhase.Model.*;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Controller
 public class ContentController {
 
     @Autowired
     private AppUsuarioRepository usuarioRepository;
+
     @Autowired
     private SolicitudRepository solicitudRepository;
 
@@ -40,13 +42,10 @@ public class ContentController {
         return usuarioRepository.findByNombreUsuario(username);
     }
 
-
     @GetMapping("/login")
     public String login() {
         return "login";
     }
-
-
 
     @GetMapping("/index")
     public String index(Model model, Authentication auth) {
@@ -56,21 +55,22 @@ public class ContentController {
             return "redirect:/login";
         }
 
-
-        model.addAttribute("idUsuario", userOptional.get().getIdTipoUsuario());
+        // Enviar ID y Nombre correctos del usuario logueado
+        model.addAttribute("idUsuario", userOptional.get().getIdUsuario());
         model.addAttribute("nombreUsuario", userOptional.get().getNombreUsuario());
 
-        if (userOptional.get().getIdTipoUsuario() == 1) {
-            return "indexadmin";
-        } else if (userOptional.get().getIdTipoUsuario() == 2) {
+        long tipo = userOptional.get().getIdTipoUsuario();
+
+        if (tipo == 1) {
+            return "redirect:/indexadmin";
+        } else if (tipo == 2) {
             return "index";
-        } else if (userOptional.get().getIdTipoUsuario() == 3) {
-            return "indexAutoriza";
+        } else if (tipo == 3) {
+            return "redirect:/indexAutoriza";
         }
 
         return "index";
     }
-
 
     @GetMapping("/indexadmin")
     public String indexAdmin(Model model, Authentication auth) {
@@ -82,13 +82,14 @@ public class ContentController {
             model.addAttribute("idUsuario", user.getIdUsuario());
             model.addAttribute("nombreUsuario", user.getNombreUsuario());
 
+            // Datos para el dashboard de ADMIN
             long tareasPendientes = solicitudRepository.countByIdUsuarioAndIdEstadoSolicitud(user.getIdUsuario(), 3L);
             model.addAttribute("tareasPendientes", tareasPendientes);
 
             List<Solicitud> misTareasRecientes = solicitudRepository.findTop5ByIdUsuarioOrderByFechaCreacionDesc(user.getIdUsuario());
             model.addAttribute("misTareas", misTareasRecientes);
 
-            model.addAttribute("categorias", categoriaRepo.findAll()); // Asegúrate de inyectar categoriaRepo en este Controller si no está
+            model.addAttribute("categorias", categoriaRepo.findAll());
             model.addAttribute("prioridades", prioridadRepo.findAll());
 
             return "indexadmin";
@@ -96,7 +97,6 @@ public class ContentController {
 
         return "redirect:/index";
     }
-
 
     @GetMapping("/indexAutoriza")
     public String indexAutoriza(Model model, Authentication auth) {
@@ -108,9 +108,13 @@ public class ContentController {
             model.addAttribute("idUsuario", user.getIdUsuario());
             model.addAttribute("nombreUsuario", user.getNombreUsuario());
 
+            // --- ESTO ES LO NUEVO QUE ARREGLA EL ERROR ---
+
+            // 1. Contador grande
             long pendientes = solicitudRepository.countByIdUsuarioIsNull();
             model.addAttribute("cantPendientes", pendientes);
 
+            // 2. Carga de trabajo (Esto faltaba y causaba el error null en el HTML)
             List<AppUsuario> tecnicos = usuarioRepository.findByIdTipoUsuario(1L);
             Map<String, Long> cargaTrabajo = new HashMap<>();
 
@@ -120,9 +124,11 @@ public class ContentController {
             }
             model.addAttribute("cargaTrabajo", cargaTrabajo);
 
+            // 3. Tabla inferior de últimas solicitudes
             List<Solicitud> ultimasPendientes = solicitudRepository.findTop5ByIdUsuarioIsNullOrderByFechaCreacionDesc();
             model.addAttribute("ultimasPendientes", ultimasPendientes);
 
+            // 4. Lista de usuarios para traducir IDs a Nombres en la tabla
             model.addAttribute("usuarios", usuarioRepository.findAll());
 
             return "indexAutoriza";
@@ -130,5 +136,4 @@ public class ContentController {
 
         return "redirect:/index";
     }
-
 }

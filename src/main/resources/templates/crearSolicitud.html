@@ -9,15 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
         body {
-            /* Fondo degradado del tema */
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
@@ -32,9 +26,9 @@
             border-radius: 20px;
             padding: 2.5rem;
             width: 100%;
-            max-width: 600px; /* Ancho máximo para que se vea elegante */
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            animation: fadeIn 0.5s ease-out;
+            max-width: 550px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            animation: fadeIn 0.6s ease-out;
         }
 
         @keyframes fadeIn {
@@ -45,33 +39,37 @@
         h2 {
             color: #667eea;
             font-weight: 700;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             text-align: center;
+            font-size: 1.8rem;
         }
 
         .form-label {
             font-weight: 600;
             color: #4a5568;
             margin-bottom: 0.5rem;
+            font-size: 0.95rem;
         }
 
-        .form-select {
+        .form-control, .form-select {
             border-radius: 12px;
             padding: 0.8rem 1rem;
             border: 2px solid #e2e8f0;
             margin-bottom: 1.5rem;
             transition: all 0.3s;
+            background-color: #f8fafc;
         }
 
-        .form-select:focus {
+        .form-control:focus, .form-select:focus {
             border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+            background-color: white;
         }
 
-        /* --- ESTILOS DEL ARCHIVO ADJUNTO (Adaptados) --- */
+        /* --- ESTILOS DEL ARCHIVO ADJUNTO --- */
         .custum-file-upload {
             height: 180px;
-            width: 100%; /* Ocupa todo el ancho disponible */
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -79,35 +77,42 @@
             gap: 15px;
             cursor: pointer;
             border: 2px dashed #cbd5e0;
-            background-color: #f7fafc;
+            background-color: #f8fafc;
             padding: 1.5rem;
             border-radius: 15px;
+            box-shadow: inset 0px 2px 4px rgba(0,0,0,0.02);
             transition: all 0.3s ease;
+            margin-bottom: 2rem;
         }
 
         .custum-file-upload:hover {
             border-color: #667eea;
             background-color: #ebf4ff;
+            transform: translateY(-2px);
         }
 
         .custum-file-upload .icon svg {
             height: 60px;
             fill: #718096;
-            transition: fill 0.3s;
+            transition: all 0.3s;
         }
 
         .custum-file-upload:hover .icon svg {
             fill: #667eea;
+            transform: scale(1.1);
         }
 
         .custum-file-upload .text span {
             font-weight: 500;
             color: #718096;
+            transition: color 0.3s;
         }
 
-        .custum-file-upload input {
-            display: none;
+        .custum-file-upload:hover .text span {
+            color: #5a67d8;
         }
+
+        .custum-file-upload input { display: none; }
 
         /* --- BOTONES --- */
         .btn-submit {
@@ -118,42 +123,44 @@
             padding: 1rem;
             border-radius: 12px;
             font-weight: 600;
-            font-size: 1.1rem;
-            margin-top: 1.5rem;
-            transition: transform 0.2s;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
         .btn-submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            filter: brightness(1.1);
         }
 
         .btn-back {
             display: block;
             text-align: center;
-            margin-top: 1rem;
-            color: #718096;
+            margin-top: 1.5rem;
+            color: #a0aec0;
             text-decoration: none;
             font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s;
         }
 
-        .btn-back:hover {
-            color: #4a5568;
-            text-decoration: underline;
-        }
+        .btn-back:hover { color: #718096; }
     </style>
 </head>
 <body>
 
 <div class="card-form">
-    <h2><i class="bi bi-file-earmark-plus-fill"></i> Nueva Solicitud</h2>
+    <h2><i class="bi bi-folder-plus text-primary me-2"></i>Nueva Solicitud</h2>
 
-    <div th:if="${mensaje}" class="alert alert-success d-flex align-items-center" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i>
+    <div th:if="${mensaje}" class="alert alert-success d-flex align-items-center rounded-3" role="alert">
+        <i class="bi bi-check-circle-fill me-2 fs-5"></i>
         <div th:text="${mensaje}"></div>
     </div>
-    <div th:if="${error}" class="alert alert-danger d-flex align-items-center" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <div th:if="${error}" class="alert alert-danger d-flex align-items-center rounded-3" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
         <div th:text="${error}"></div>
     </div>
 
@@ -182,7 +189,13 @@
             </select>
         </div>
 
-        <div class="mb-3">
+        <div>
+            <label class="form-label">Correo de Notificación:</label>
+            <input type="email" th:field="*{correo}" class="form-control"
+                   placeholder="ejemplo@correo.com" required>
+        </div>
+
+        <div>
             <label class="form-label">Documento o Imagen de soporte:</label>
 
             <label class="custum-file-upload" for="archivoAdjunto">
@@ -196,7 +209,7 @@
                     </svg>
                 </div>
                 <div class="text">
-                    <span id="file-text">Click para subir archivo</span>
+                    <span id="file-label">Haz clic para subir un archivo</span>
                 </div>
                 <input type="file" id="archivoAdjunto" name="archivoAdjunto" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx">
             </label>
@@ -209,10 +222,18 @@
 
 <script>
     document.getElementById('archivoAdjunto').addEventListener('change', function(event) {
-        const fileName = event.target.files[0] ? event.target.files[0].name : "Click para subir archivo";
-        document.getElementById('file-text').textContent = fileName;
-        document.getElementById('file-text').style.color = "#667eea";
-        document.getElementById('file-text').style.fontWeight = "bold";
+        const fileInput = event.target;
+        const fileLabel = document.getElementById('file-label');
+
+        if (fileInput.files.length > 0) {
+            fileLabel.textContent = "Archivo: " + fileInput.files[0].name;
+            fileLabel.style.color = "#667eea";
+            fileLabel.style.fontWeight = "bold";
+        } else {
+            fileLabel.textContent = "Haz clic para subir un archivo";
+            fileLabel.style.color = "#718096";
+            fileLabel.style.fontWeight = "500";
+        }
     });
 </script>
 

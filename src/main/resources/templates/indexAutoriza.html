@@ -187,11 +187,22 @@
                 <small class="text-muted" style="font-size: 0.8rem;">Usuario: <span th:text="${nombreUsuario}">Nombre</span> | Rol: Asignador</small>
             </div>
         </div>
-        <form th:action="@{/logout}" method="post" class="m-0">
-            <button type="submit" class="btn-logout">
-                Cerrar Sesión
-            </button>
-        </form>
+
+        <div class="d-flex align-items-center gap-2">
+            <a href="/mensajes" class="btn btn-light rounded-circle text-primary border d-flex align-items-center justify-content-center shadow-sm"
+               style="width: 40px; height: 40px; transition: transform 0.2s;"
+               onmouseover="this.style.transform='scale(1.1)'"
+               onmouseout="this.style.transform='scale(1)'"
+               title="Mensajería">
+                <i class="bi bi-chat-dots-fill"></i>
+            </a>
+
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="btn-logout">
+                    Cerrar Sesión
+                </button>
+            </form>
+        </div>
     </div>
 
     <div class="dashboard-banner">
