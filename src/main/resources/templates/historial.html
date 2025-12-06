@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Historial</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        #previewFrame { width: 100%; height: 500px; border: none; }
+        #previewImage { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body class="bg-light p-4">
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary" th:text="${titulo}">Historial</h2>
+        <a href="/index" class="btn btn-secondary">Volver al Inicio</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Categoría</th>
+                    <th>Fecha</th>
+                    <th>Resolución</th> <th>Comentario Técnico</th> <th>Adjunto</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${solicitudes.empty}">
+                    <td colspan="6" class="text-center text-muted">No hay historial disponible.</td>
+                </tr>
+                <tr th:each="sol : ${solicitudes}">
+                    <td th:text="${sol.idSolicitud}" class="fw-bold"></td>
+                    <td>
+                        <span th:each="cat : ${categorias}" th:if="${cat.idCategoria == sol.idCategoriaSolicitud}" th:text="${cat.nombre}"></span>
+                    </td>
+                    <td th:text="${sol.fechaCreacion}"></td>
+                    <td>
+                        <span class="badge" th:each="est : ${estados}" th:if="${est.idEstado == sol.idEstadoSolicitud}"
+                              th:text="${est.estado}"
+                              th:classappend="${est.estado == 'APROBADA' ? ' bg-success' : ' bg-danger'}">
+                        </span>
+                    </td>
+                    <td th:text="${sol.comentario != null ? sol.comentario : '-'}"></td>
+
+                    <td class="text-center">
+                        <div th:if="${sol.rutaAdjunto != null and !sol.rutaAdjunto.isEmpty()}"
+                             th:with="ruta=${sol.rutaAdjunto.toLowerCase()},
+                                      esImagen=${#strings.endsWith(ruta, '.jpg') or #strings.endsWith(ruta, '.png')},
+                                      esPdf=${#strings.endsWith(ruta, '.pdf')}">
+                            <button th:if="${esImagen or esPdf}" type="button" class="btn btn-sm btn-outline-info"
+                                    data-bs-toggle="modal" data-bs-target="#modalVisualizar"
+                                    th:onclick="cargarPrevisualizacion([[${sol.idSolicitud}]], [[${esImagen}]])">
+                                <i class="bi bi-eye-fill"></i>
+                            </button>
+                            <a th:unless="${esImagen or esPdf}" th:href="@{/solicitud/descargar/{id}(id=${sol.idSolicitud})}"
+                               class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i></a>
+                        </div>
+                        <span th:unless="${sol.rutaAdjunto != null}" class="text-muted">-</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalVisualizar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Vista Previa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center bg-dark">
+                <img id="previewImage" src="" style="display: none;">
+                <iframe id="previewFrame" src="" style="display: none;"></iframe>
+            </div>
+            <div class="modal-footer bg-light">
+                <a id="btnDescargarModal" href="#" class="btn btn-primary">Descargar</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function cargarPrevisualizacion(id, esImagen) {
+        const urlVer = '/solicitud/ver-archivo/' + id;
+        const urlDown = '/solicitud/descargar/' + id;
+        document.getElementById('btnDescargarModal').href = urlDown;
+        const img = document.getElementById('previewImage');
+        const frame = document.getElementById('previewFrame');
+        img.style.display = 'none'; frame.style.display = 'none';
+        if(esImagen) { img.src = urlVer; img.style.display = 'block'; }
+        else { frame.src = urlVer; frame.style.display = 'block'; }
+    }
+</script>
+</body>
+</html>

@@ -272,5 +272,74 @@ public class SolicitudController {
     }
 
 
+    @GetMapping("/mis-solicitudes")
+    public String verMisSolicitudes(Model model, Authentication auth) {
+        Optional<AppUsuario> userOptional = getLoggedInUser(auth);
+        if (userOptional.isEmpty()) return "redirect:/login";
+
+        Long idUsuario = userOptional.get().getIdUsuario();
+
+        List<Solicitud> misSolicitudes = solicitudRepo.findMisSolicitudesActivas(idUsuario);
+
+        model.addAttribute("solicitudes", misSolicitudes);
+        model.addAttribute("categorias", categoriaRepo.findAll());
+        model.addAttribute("estados", estadoRepo.findAll());
+        model.addAttribute("prioridades", prioridadRepo.findAll());
+        model.addAttribute("titulo", "Mis Solicitudes Activas");
+
+        return "misSolicitudes";
+    }
+
+    @GetMapping("/historial")
+    public String verHistorial(Model model, Authentication auth) {
+        Optional<AppUsuario> userOptional = getLoggedInUser(auth);
+        if (userOptional.isEmpty()) return "redirect:/login";
+
+        Long idUsuario = userOptional.get().getIdUsuario();
+
+        List<Solicitud> historial = solicitudRepo.findMisSolicitudesHistorial(idUsuario);
+
+        model.addAttribute("solicitudes", historial);
+        model.addAttribute("categorias", categoriaRepo.findAll());
+        model.addAttribute("estados", estadoRepo.findAll());
+        model.addAttribute("prioridades", prioridadRepo.findAll());
+        model.addAttribute("titulo", "Historial de Solicitudes");
+
+        return "historial";
+    }
+
+
+    @PostMapping("/eliminar")
+    public String eliminarSolicitud(@RequestParam("idSolicitud") Long idSolicitud,
+                                    RedirectAttributes redirectAttributes) {
+        try {
+            Optional<Solicitud> solicitudOpt = solicitudRepo.findById(idSolicitud);
+
+            if (solicitudOpt.isPresent()) {
+                Solicitud solicitud = solicitudOpt.get();
+
+                if (solicitud.getRutaAdjunto() != null && !solicitud.getRutaAdjunto().isEmpty()) {
+                    try {
+                        ftpStorageService.eliminarArchivo(solicitud.getRutaAdjunto());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        System.out.println("Advertencia: No se pudo borrar el archivo físico, pero se borrará el registro.");
+                    }
+                }
+
+                solicitudRepo.deleteById(idSolicitud);
+
+                redirectAttributes.addFlashAttribute("mensaje", "Solicitud eliminada correctamente.");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "La solicitud no existe.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Error al intentar eliminar la solicitud.");
+        }
+
+        return "redirect:/solicitud/misSolicitudes";
+    }
 
 }

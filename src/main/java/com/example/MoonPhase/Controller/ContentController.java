@@ -44,7 +44,7 @@ public class ContentController {
 
 
         model.addAttribute("idUsuario", userOptional.get().getIdTipoUsuario());
-        model.addAttribute("nombreUsuario", userOptional.get().getIdTipoUsuario());
+        model.addAttribute("nombreUsuario", userOptional.get().getNombreUsuario());
 
         if (userOptional.get().getIdTipoUsuario() == 1) {
             return "indexadmin";

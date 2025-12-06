@@ -52,25 +52,18 @@ public class FtpStorageService {
                 throw new IOException("Credenciales FTP incorrectas.");
             }
 
-            // Configuración importante para transferencia de archivos binarios (imágenes, pdf, etc.)
             ftpClient.enterLocalPassiveMode();
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
-            // 1. Crear estructura de directorios: base/idSolicitud/
             String directorioDestino = baseDirSolicitudes + idSolicitud + "/";
             crearDirectorios(ftpClient, directorioDestino);
 
-            // 2. Cambiar al directorio de destino
             ftpClient.changeWorkingDirectory(directorioDestino);
 
-            // 3. Nombre del archivo a guardar (usamos el original)
             String nombreArchivo = file.getOriginalFilename();
-            // (Opcional: podrías agregar un UUID al nombre para evitar duplicados si se permite subir múltiples archivos por solicitud)
-            // String nombreArchivo = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
             rutaFinalFtp = directorioDestino + nombreArchivo;
 
-            // 4. Subir el archivo
             try (InputStream inputStream = file.getInputStream()) {
                 boolean done = ftpClient.storeFile(nombreArchivo, inputStream);
                 if (!done) {
@@ -88,10 +81,8 @@ public class FtpStorageService {
         return rutaFinalFtp;
     }
 
-    // Método auxiliar para crear directorios anidados si no existen
-    // Método auxiliar mejorado con logs y manejo de errores
+
     private void crearDirectorios(FTPClient ftpClient, String rutaPath) throws IOException {
-        // Normalizar ruta para evitar problemas con dobles barras
         if (rutaPath.startsWith("/")) {
             ftpClient.changeWorkingDirectory("/");
         }
@@ -100,12 +91,10 @@ public class FtpStorageService {
 
         for (String dir : directorios) {
             if (!dir.isEmpty()) {
-                // Intentar cambiar al directorio
                 boolean existe = false;
                 try {
                     existe = ftpClient.changeWorkingDirectory(dir);
                 } catch (IOException e) {
-                    // Si el servidor corta la conexión en un 550, lo capturamos aquí
                     System.out.println("Aviso: El servidor lanzó error al buscar directorio '" + dir + "': " + e.getMessage());
                     existe = false;
                 }
@@ -145,9 +134,37 @@ public class FtpStorageService {
                 ftpClient.logout();
                 ftpClient.disconnect();
             }
-            outputStream.close(); // Buena práctica, aunque en ByteArrayOutputStream es no-op
+            outputStream.close();
         }
     }
 
+
+    public void eliminarArchivo(String rutaFtp) throws IOException {
+        if (rutaFtp == null || rutaFtp.isEmpty()) {
+            return;
+        }
+
+        FTPClient ftpClient = new FTPClient();
+        try {
+            ftpClient.connect(server, port);
+            ftpClient.login(user, password);
+            ftpClient.enterLocalPassiveMode();
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+            boolean deleted = ftpClient.deleteFile(rutaFtp);
+
+            if (deleted) {
+                System.out.println("Archivo eliminado del FTP: " + rutaFtp);
+            } else {
+                System.out.println("No se pudo borrar el archivo (tal vez no existía): " + rutaFtp);
+            }
+
+        } finally {
+            if (ftpClient.isConnected()) {
+                ftpClient.logout();
+                ftpClient.disconnect();
+            }
+        }
+    }
 
 }
