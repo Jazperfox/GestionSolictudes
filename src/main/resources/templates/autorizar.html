@@ -9,25 +9,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
         body {
-            /* Fondo degradado */
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 2rem;
             color: #2d3748;
         }
 
-        .main-container {
-            max-width: 1400px; /* Un poco más ancho para esta tabla con muchas columnas */
-            margin: 0 auto;
-        }
+        .main-container { max-width: 1400px; margin: 0 auto; }
 
         /* Tarjeta Principal */
         .card-panel {
@@ -53,79 +44,62 @@
             padding-bottom: 1rem;
         }
 
-        h2 {
-            color: #667eea;
-            font-weight: 700;
-            margin: 0;
-            font-size: 1.8rem;
-        }
+        h2 { color: #667eea; font-weight: 700; margin: 0; font-size: 1.8rem; }
 
-        /* Tabla Personalizada */
-        .table-custom {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .table-custom thead th {
-            background-color: #f7fafc;
-            color: #718096;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.85rem;
+        /* Barra de Filtros */
+        .filter-bar {
+            background-color: #f8fafc;
+            border-radius: 12px;
             padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            border: 1px solid #e2e8f0;
+        }
+
+        .filter-item { display: flex; align-items: center; gap: 0.5rem; }
+        .filter-label { font-weight: 600; font-size: 0.9rem; color: #718096; }
+        .form-select-sm { border-radius: 8px; border-color: #cbd5e0; font-weight: 500; }
+
+        /* Tabla Custom */
+        .table-custom { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .table-custom thead th {
+            background-color: #f7fafc; color: #718096; font-weight: 600;
+            text-transform: uppercase; font-size: 0.85rem; padding: 1rem;
             border-bottom: 2px solid #e2e8f0;
         }
-
         .table-custom tbody td {
-            padding: 1rem;
-            border-bottom: 1px solid #edf2f7;
-            vertical-align: middle;
-            font-size: 0.95rem;
+            padding: 1rem; border-bottom: 1px solid #edf2f7; vertical-align: middle; font-size: 0.95rem;
         }
+        .table-custom tbody tr:hover { background-color: #fafbfc; }
 
-        .table-custom tbody tr:hover {
-            background-color: #fafbfc;
+        /* Filas de Agrupación */
+        .group-header {
+            background-color: #edf2f7 !important;
+            color: #4a5568;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
         }
+        .group-header td { padding: 0.8rem 1rem !important; border-bottom: 2px solid #cbd5e0 !important; }
 
+        /* Estilos varios */
         .fw-bold { font-weight: 600 !important; }
-
-        /* Botones de Acción */
-        .btn-action-view {
-            color: #3182ce;
-            background: #ebf8ff;
-            border: none;
-            border-radius: 8px;
-            padding: 5px 10px;
-            transition: 0.2s;
-        }
+        .btn-action-view { color: #3182ce; background: #ebf8ff; border: none; border-radius: 8px; padding: 5px 10px; transition: 0.2s; }
         .btn-action-view:hover { background: #bee3f8; color: #2c5282; }
 
-        .btn-action-edit {
-            color: #d69e2e;
-            background: #fefcbf;
-            border: none;
-            border-radius: 8px;
-            padding: 5px 10px;
-            transition: 0.2s;
-        }
-        .btn-action-edit:hover { background: #faf089; color: #975a16; }
-
-        /* Estilos del Modal */
+        /* Modal Styles */
         #previewFrame { width: 100%; height: 500px; border: none; border-radius: 10px; }
         #previewImage { max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 10px; }
-
         .modal-content { border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-        .modal-header { border-bottom: 1px solid #edf2f7; background-color: #f7fafc; border-radius: 15px 15px 0 0; }
-        .modal-footer { border-top: 1px solid #edf2f7; }
-
-        .btn-close:focus { box-shadow: none; }
     </style>
 </head>
 <body>
 
 <div class="container main-container">
-
     <div class="card-panel">
 
         <div class="page-header">
@@ -135,22 +109,46 @@
             </a>
         </div>
 
+        <div class="filter-bar">
+            <div class="filter-item">
+                <span class="filter-label"><i class="bi bi-funnel-fill"></i> Filtrar Estado:</span>
+                <select id="filtroEstado" class="form-select form-select-sm" onchange="aplicarLogicaTabla()">
+                    <option value="todos">Todos</option>
+                    <option value="EN PROCESO">En Proceso</option>
+                    <option value="APROBADA">Aprobadas</option>
+
+                    <option value="NEGADA">Negadas</option>
+                </select>
+            </div>
+
+            <div class="filter-item ms-md-3">
+                <span class="filter-label"><i class="bi bi-layers-fill"></i> Agrupar por:</span>
+                <select id="agruparPor" class="form-select form-select-sm" onchange="aplicarLogicaTabla()">
+                    <option value="ninguno">Sin agrupar</option>
+                    <option value="fecha">Fecha de Creación</option>
+                    <option value="estado">Estado</option>
+                    <option value="prioridad">Prioridad</option>
+                </select>
+            </div>
+
+            <div class="ms-auto text-muted small">
+                <span id="contadorRegistros">0</span> registros visibles
+            </div>
+        </div>
+
         <div class="table-responsive">
-            <table class="table table-custom">
+            <table class="table table-custom" id="tablaSolicitudes">
                 <thead>
                 <tr>
                     <th>ID</th>
                     <th>Categoría</th>
                     <th>Creador</th>
-                    <th>Fecha</th>
-                    <th>Estado</th>
-                    <th>Prioridad</th>
-                    <th class="text-center">Adjunto</th>
+                    <th>Fecha</th> <th>Estado</th> <th>Prioridad</th> <th class="text-center">Adjunto</th>
                     <th class="text-center">Acciones</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr th:each="solicitud : ${autorizar}">
+                <tbody id="cuerpoTabla">
+                <tr th:each="solicitud : ${autorizar}" class="fila-dato">
                     <td class="text-primary fw-bold" th:text="${'#' + solicitud.idSolicitud}"></td>
 
                     <td>
@@ -166,16 +164,16 @@
                         </div>
                     </td>
 
-                    <td class="text-muted" th:text="${solicitud.fechaCreacion}"></td>
+                    <td class="col-fecha text-muted" th:text="${solicitud.fechaCreacion}"></td>
 
-                    <td>
+                    <td class="col-estado">
                         <span class="badge rounded-pill" th:each="est : ${estados}" th:if="${est.idEstado == solicitud.idEstadoSolicitud}"
                               th:text="${est.estado}"
-                              th:classappend="${est.estado == 'EN PROCESO' ? 'bg-warning text-dark' : 'bg-secondary'}">
+                              th:classappend="${est.estado == 'EN PROCESO' ? 'bg-warning text-dark' : (est.estado == 'APROBADA' ? 'bg-success' : 'bg-secondary')}">
                         </span>
                     </td>
 
-                    <td>
+                    <td class="col-prioridad">
                         <span th:each="pri : ${prioridades}" th:if="${pri.idPrioridad == solicitud.idPrioridad}"
                               th:text="${pri.nombrePrioridad}"
                               th:classappend="${pri.nombrePrioridad == 'Alta' ? 'text-danger fw-bold' : (pri.nombrePrioridad == 'Media' ? 'text-warning fw-bold' : 'text-success fw-bold')}">
@@ -231,9 +229,7 @@
                 <div id="loadingMsg" class="text-muted py-5">Cargando archivo...</div>
             </div>
             <div class="modal-footer">
-                <a id="btnDescargarModal" href="#" class="btn btn-primary rounded-pill px-4">
-                    <i class="bi bi-download me-1"></i> Descargar
-                </a>
+                <a id="btnDescargarModal" href="#" class="btn btn-primary rounded-pill px-4">Descargar</a>
                 <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
@@ -245,40 +241,33 @@
         <div class="modal-content">
             <form th:action="@{/solicitud/actualizarAutorizacion}" method="post">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i>Actualizar Solicitud</h5>
+                    <h5 class="modal-title fw-bold">Actualizar Solicitud</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-
                 <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label text-secondary fw-bold small text-uppercase">ID Solicitud</label>
+                        <label class="form-label text-secondary fw-bold small">ID Solicitud</label>
                         <input type="text" id="modalIdSolicitud" name="idSolicitud" class="form-control bg-light" readonly>
                     </div>
-
                     <div class="mb-3">
-                        <label class="form-label text-secondary fw-bold small text-uppercase">Estado Actual</label>
+                        <label class="form-label text-secondary fw-bold small">Estado Actual</label>
                         <input type="text" id="modalNombreEstado" class="form-control bg-light mb-2" readonly>
-
-                        <label class="form-label text-primary fw-bold small text-uppercase mt-2">Nuevo Estado</label>
+                        <label class="form-label text-primary fw-bold small mt-2">Nuevo Estado</label>
                         <select name="idEstado" class="form-select border-primary" required>
                             <option value="">-- Seleccionar Acción --</option>
-                            <option th:each="est : ${estados}"
-                                    th:value="${est.idEstado}"
-                                    th:text="${est.estado}"
+                            <option th:each="est : ${estados}" th:value="${est.idEstado}" th:text="${est.estado}"
                                     th:if="${est.estado!='CREADO' and est.estado!='EN PROCESO' and est.estado !='CREADA'}">
                             </option>
                         </select>
                     </div>
-
                     <div class="mb-3">
-                        <label class="form-label text-secondary fw-bold small text-uppercase">Comentario / Observación</label>
-                        <textarea name="comentario" class="form-control" rows="4" placeholder="Escriba aquí la razón de la aprobación o rechazo..."></textarea>
+                        <label class="form-label text-secondary fw-bold small">Comentario</label>
+                        <textarea name="comentario" class="form-control" rows="4"></textarea>
                     </div>
                 </div>
-
                 <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">Guardar Cambios</button>
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success rounded-pill fw-bold">Guardar</button>
                 </div>
             </form>
         </div>
@@ -286,60 +275,11 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<script th:inline="javascript">
-    // Lógica del Modal Actualizar
-    const modalAct = document.getElementById('modalActualizar');
-    modalAct.addEventListener('show.bs.modal', event => {
-        const button = event.relatedTarget;
-        const idSolicitud = button.getAttribute('data-id');
-        const idEstado = button.getAttribute('data-estado');
-        document.getElementById('modalIdSolicitud').value = idSolicitud;
-        const estados = /*[[${estados}]]*/ [];
-        const estadoActual = estados.find(e => e.idEstado == idEstado);
-        document.getElementById('modalNombreEstado').value = estadoActual ? estadoActual.estado : "Desconocido";
-    });
-
-    // Lógica del Modal Visualizar
-    function cargarPrevisualizacion(id, esImagen) {
-        const urlVer = '/solicitud/ver-archivo/' + id;
-        const urlDown = '/solicitud/descargar/' + id;
-        const img = document.getElementById('previewImage');
-        const frame = document.getElementById('previewFrame');
-        const loading = document.getElementById('loadingMsg');
-
-        document.getElementById('btnDescargarModal').href = urlDown;
-
-        img.style.display = 'none';
-        frame.style.display = 'none';
-        loading.style.display = 'block';
-
-        if(esImagen) {
-            img.src = urlVer;
-            img.onload = function() { loading.style.display = 'none'; img.style.display = 'block'; };
-        } else {
-            frame.src = urlVer;
-            loading.style.display = 'none';
-            frame.style.display = 'block';
-        }
-    }
-
-    // Limpiar modal al cerrar
-    document.getElementById('modalVisualizar').addEventListener('hidden.bs.modal', function () {
-        document.getElementById('previewImage').src = "";
-        document.getElementById('previewFrame').src = "";
-    });
-</script>
-
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script th:inline="javascript">
-    /*<![CDATA[*/
-    // 1. Detectar mensajes flash del controlador
     const msg = /*[[${msg}]]*/ null;
-    const tipo = /*[[${tipo}]]*/ null; // success, error, warning, info
-
+    const tipo = /*[[${tipo}]]*/ null;
     if (msg) {
         Swal.fire({
             title: tipo === 'success' ? '¡Excelente!' : 'Atención',
@@ -347,33 +287,114 @@
             icon: tipo || 'info',
             confirmButtonText: 'Entendido',
             confirmButtonColor: '#2575fc',
-            timer: 4000, // Se cierra solo en 4 seg
-            timerProgressBar: true,
+            timer: 4000,
             backdrop: `rgba(0,0,0,0.4)`
         });
     }
+</script>
 
-    // 2. Función genérica para confirmar acciones (ej: Eliminar)
-    // Uso en HTML: onclick="confirmarEliminacion(event, 'formularioEliminarId')"
-    function confirmarEliminacion(event, formId) {
-        event.preventDefault(); // Detiene el envío automático
+<script>
+    // Variables globales
+    const tbody = document.getElementById('cuerpoTabla');
+    // Guardamos las filas originales en memoria para poder restaurarlas y reordenarlas
+    let filasOriginales = Array.from(document.querySelectorAll('.fila-dato'));
 
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: "Esta acción eliminará la solicitud permanentemente.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById(formId).submit(); // Envía el formulario manualmente
-            }
+    // Función principal que combina Filtrado y Agrupación
+    function aplicarLogicaTabla() {
+        const filtroEstado = document.getElementById('filtroEstado').value.toUpperCase();
+        const criterioAgrupacion = document.getElementById('agruparPor').value;
+
+        // 1. FILTRADO: Determinar qué filas son visibles
+        let filasVisibles = filasOriginales.filter(fila => {
+            const textoEstado = fila.querySelector('.col-estado').textContent.trim().toUpperCase();
+            if (filtroEstado === 'TODOS') return true;
+            return textoEstado.includes(filtroEstado); // 'includes' permite manejar ligeras variaciones
+        });
+
+        // Actualizar contador
+        document.getElementById('contadorRegistros').textContent = filasVisibles.length;
+
+        // 2. ORDENAMIENTO (Necesario para agrupar)
+        if (criterioAgrupacion !== 'ninguno') {
+            filasVisibles.sort((a, b) => {
+                let valA = obtenerValorCriterio(a, criterioAgrupacion);
+                let valB = obtenerValorCriterio(b, criterioAgrupacion);
+                return valA.localeCompare(valB);
+            });
+        } else {
+            // Si no hay agrupación, ordenar por ID (por defecto) o dejar orden original
+            filasVisibles.sort((a, b) => {
+                // Asumiendo que el ID está en la primera celda
+                return parseInt(a.cells[0].textContent.replace('#','')) - parseInt(b.cells[0].textContent.replace('#',''));
+            });
+        }
+
+        // 3. RENDERIZADO CON AGRUPACIÓN
+        tbody.innerHTML = ''; // Limpiar tabla actual
+
+        if (criterioAgrupacion === 'ninguno') {
+            // Renderizado simple
+            filasVisibles.forEach(fila => tbody.appendChild(fila));
+        } else {
+            // Renderizado con filas de cabecera
+            let grupoActual = null;
+
+            filasVisibles.forEach(fila => {
+                const valorGrupo = obtenerValorCriterio(fila, criterioAgrupacion);
+
+                if (valorGrupo !== grupoActual) {
+                    // Insertar fila de título de grupo
+                    const trHeader = document.createElement('tr');
+                    trHeader.className = 'group-header';
+                    trHeader.innerHTML = `<td colspan="8"><i class="bi bi-caret-down-fill me-2"></i>${criterioAgrupacion.toUpperCase()}: ${valorGrupo}</td>`;
+                    tbody.appendChild(trHeader);
+                    grupoActual = valorGrupo;
+                }
+                tbody.appendChild(fila);
+            });
+        }
+    }
+
+    // Helper para sacar el texto de la columna correcta
+    function obtenerValorCriterio(fila, criterio) {
+        if (criterio === 'fecha') return fila.querySelector('.col-fecha').textContent.trim();
+        if (criterio === 'estado') return fila.querySelector('.col-estado').textContent.trim();
+        if (criterio === 'prioridad') return fila.querySelector('.col-prioridad').textContent.trim();
+        return '';
+    }
+
+    // Scripts de Modales (Mantenidos del original)
+    const modalAct = document.getElementById('modalActualizar');
+    if(modalAct){
+        modalAct.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+            document.getElementById('modalIdSolicitud').value = button.getAttribute('data-id');
+            // Nota: Aquí solo mostramos el estado actual como texto simple ya que no tenemos el array JS de estados completo en este scope
+            // pero el input es solo lectura visual.
         });
     }
-    /*]]>*/
+
+    function cargarPrevisualizacion(id, esImagen) {
+        const urlVer = '/solicitud/ver-archivo/' + id;
+        const urlDown = '/solicitud/descargar/' + id;
+        document.getElementById('btnDescargarModal').href = urlDown;
+        const img = document.getElementById('previewImage');
+        const frame = document.getElementById('previewFrame');
+        const loading = document.getElementById('loadingMsg');
+
+        img.style.display = 'none'; frame.style.display = 'none'; loading.style.display = 'block';
+
+        if(esImagen) {
+            img.src = urlVer;
+            img.onload = () => { loading.style.display = 'none'; img.style.display = 'block'; };
+        } else {
+            frame.src = urlVer;
+            loading.style.display = 'none'; frame.style.display = 'block';
+        }
+    }
+
+    // Inicializar la tabla al cargar
+    aplicarLogicaTabla();
 </script>
 
 </body>

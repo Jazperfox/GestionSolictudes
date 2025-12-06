@@ -17,7 +17,7 @@ public interface SolicitudRepository extends JpaRepository<Solicitud, Long> {
     List<Solicitud> findSolicitudesNoAsignadasJPQL();
 
 
-    @Query("SELECT s FROM Solicitud s  WHERE s.idEstadoSolicitud <> 4 AND s.idUsuario = :idUsuario")
+    @Query("SELECT s FROM Solicitud s WHERE s.idUsuario = :idUsuario")
     List<Solicitud> findSolicitudesAAutorizar(@Param("idUsuario") Long idUsuario);
 
 
