@@ -231,11 +231,12 @@
                     <td class="text-center">
                         <form th:action="@{/solicitud/eliminar}" method="post"
                               th:if="${sol.idEstadoSolicitud == 1}"
-                              onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta solicitud permanentemente? Esta acción no se puede deshacer.');">
+                              th:id="'formEliminar-' + ${sol.idSolicitud}">
 
                             <input type="hidden" name="idSolicitud" th:value="${sol.idSolicitud}" />
 
-                            <button type="submit" class="btn-action-delete" title="Eliminar Solicitud">
+                            <button type="button" class="btn-action-delete" title="Eliminar Solicitud"
+                                    th:onclick="'confirmarEliminacion(event, \'formEliminar-' + ${sol.idSolicitud} + '\')'">
                                 <i class="bi bi-trash-fill"></i> Eliminar
                             </button>
                         </form>
@@ -285,6 +286,51 @@
         if(esImagen) { img.src = urlVer; img.style.display = 'block'; }
         else { frame.src = urlVer; frame.style.display = 'block'; }
     }
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // 1. Detectar mensajes flash del controlador
+    const msg = /*[[${msg}]]*/ null;
+    const tipo = /*[[${tipo}]]*/ null; // success, error, warning, info
+
+    if (msg) {
+        Swal.fire({
+            title: tipo === 'success' ? '¡Excelente!' : 'Atención',
+            text: msg,
+            icon: tipo || 'info',
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#2575fc',
+            timer: 4000, // Se cierra solo en 4 seg
+            timerProgressBar: true,
+            backdrop: `rgba(0,0,0,0.4)`
+        });
+    }
+
+    // 2. Función genérica para confirmar acciones (ej: Eliminar)
+    // Uso en HTML: onclick="confirmarEliminacion(event, 'formularioEliminarId')"
+    function confirmarEliminacion(event, formId) {
+        event.preventDefault(); // Detiene el envío automático
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Esta acción eliminará la solicitud permanentemente.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById(formId).submit(); // Envía el formulario manualmente
+            }
+        });
+    }
+    /*]]>*/
 </script>
 
 </body>

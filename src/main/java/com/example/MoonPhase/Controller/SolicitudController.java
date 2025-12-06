@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/solicitud")
@@ -79,8 +80,7 @@ public class SolicitudController {
 
             if (solicitudGuardada.getCorreo() != null && !solicitudGuardada.getCorreo().isEmpty()) {
                 try {
-                    // BUSCAMOS EL NOMBRE DEL ESTADO 1 EN LA BD
-                    String nombreEstado = "CREADA"; // Valor por defecto
+                    String nombreEstado = "CREADA";
                     Optional<Estado> estOpt = estadoRepo.findById(1L);
                     if (estOpt.isPresent()) {
                         nombreEstado = estOpt.get().getEstado();
@@ -90,7 +90,7 @@ public class SolicitudController {
                             solicitudGuardada.getCorreo(),
                             "Solicitud Recibida - Ticket #" + solicitudGuardada.getIdSolicitud(),
                             solicitudGuardada.getIdSolicitud(),
-                            nombreEstado, // <--- Enviamos el nombre, no el número 1
+                            nombreEstado,
                             "Hemos recibido tu solicitud correctamente. Un técnico la revisará pronto."
                     );
 
@@ -99,11 +99,19 @@ public class SolicitudController {
                 }
             }
 
-            redirectAttributes.addFlashAttribute("mensaje","Solicitud creada correctamente");
+            //redirectAttributes.addFlashAttribute("mensaje","Solicitud creada correctamente");
+
+            redirectAttributes.addFlashAttribute("msg", "¡Solicitud creada exitosamente!");
+            redirectAttributes.addFlashAttribute("tipo", "success");
+
         }catch (IOException e){
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error","Error al cargar solicitud");
-            return  "redirect:/index";
+            //redirectAttributes.addFlashAttribute("error","Error al cargar solicitud");
+            redirectAttributes.addFlashAttribute("msg", "Error al cargar el archivo o guardar la solicitud.");
+            redirectAttributes.addFlashAttribute("tipo", "error");
+
+
+            return  "redirect:/solicitud/crear";
         }
 
        // solicitudRepo.save(solicitud);
@@ -112,9 +120,7 @@ public class SolicitudController {
 
     @GetMapping("/pendientes")
     public String solicitudesPendientes(Model model) {
-        //Busca solicitudes pendientes con idusuario = null
         List<Solicitud> pendientes = solicitudRepo.findSolicitudesNoAsignadasJPQL();
-        // Carga los usuarios
         List<AppUsuario> usuarios = usuarioRepo.findByIdTipoUsuario(1L);
 
         model.addAttribute("pendientes", pendientes);
@@ -125,17 +131,23 @@ public class SolicitudController {
 
     @PostMapping("/asignar")
     public String asignarSolicitud(@RequestParam("idSolicitud") Long idSolicitud,
-                                   @RequestParam("idUsuario") Long idUsuario) {
+                                   @RequestParam("idUsuario") Long idUsuario,
+                                   RedirectAttributes redirectAttributes) {
 
-        //busca solicitud por id
-        Solicitud solicitud = solicitudRepo.findById(idSolicitud)
-                .orElseThrow(() -> new IllegalArgumentException("ID de solicitud inválida: " + idSolicitud));
-        //asigna el nuevo id de usuario a la solicitud
-        solicitud.setIdUsuario(idUsuario);
-        //cambia el estado a EN PROCESO
-        solicitud.setIdEstadoSolicitud(3L);
-        // Guardar los cambios
-        solicitudRepo.save(solicitud);
+        try{
+            Solicitud solicitud = solicitudRepo.findById(idSolicitud)
+                    .orElseThrow(() -> new IllegalArgumentException("ID de solicitud inválida: " + idSolicitud));
+            solicitud.setIdUsuario(idUsuario);
+            solicitud.setIdEstadoSolicitud(3L);
+            solicitudRepo.save(solicitud);
+
+            redirectAttributes.addFlashAttribute("msg", "Técnico asignado correctamente.");
+            redirectAttributes.addFlashAttribute("tipo", "success");
+        }
+        catch (Exception e){
+            redirectAttributes.addFlashAttribute("msg", "Error al intentar asignar la solicitud.");
+            redirectAttributes.addFlashAttribute("tipo", "error");
+        }
 
         return "redirect:/solicitud/pendientes";
     }
@@ -158,9 +170,7 @@ public class SolicitudController {
 
         AppUsuario user = userOptional.get();
         Long idUsuarioLogueado = user.getIdUsuario();
-        //Busca solicitudes diferentes de estado 4, o sea, que no estén denegadas y que estén asignadas al usuario logueado
         List<Solicitud> autorizar = solicitudRepo.findSolicitudesAAutorizar(idUsuarioLogueado);
-        // carga los listados para que se muestren los nombre en la vista, y no los ID
         List<AppUsuario> usuarios = usuarioRepo.findAll();
         List<Categoria> categorias = categoriaRepo.findAll();
         List<Estado> estados = estadoRepo.findAll();
@@ -175,32 +185,32 @@ public class SolicitudController {
         return "autorizar";
     }
 
-    @GetMapping("/actualizar")
-    public String actualizarAutorizacion(Model model, Authentication auth) {
-
-        Optional<AppUsuario> userOptional = getLoggedInUser(auth);
-        if (userOptional.isEmpty()) {
-            return "redirect:/login";
-        }
-
-        AppUsuario user = userOptional.get();
-        Long idUsuarioLogueado = user.getIdUsuario();
-        //Busca solicitudes diferentes de estado 4, o sea, que no estén denegadas y que estén asignadas al usuario logueado
-        List<Solicitud> autorizar = solicitudRepo.findSolicitudesAAutorizar(idUsuarioLogueado);
-        // carga los listado para que se muestren los nombre y no los ID de los registros
-        List<AppUsuario> usuarios = usuarioRepo.findAll();
-        List<Categoria> categorias = categoriaRepo.findAll();
-        List<Estado> estados = estadoRepo.findAll();
-        List<Prioridad> prioridades = prioridadRepo.findAll();
-
-        model.addAttribute("autorizar", autorizar);
-        model.addAttribute("usuarios", usuarios);
-        model.addAttribute("categorias", categorias);
-        model.addAttribute("estados", estados);
-        model.addAttribute("prioridades", prioridades);
-
-        return "redirect:/index";
-    }
+//    @GetMapping("/actualizar")
+//    public String actualizarAutorizacion(Model model, Authentication auth) {
+//
+//        Optional<AppUsuario> userOptional = getLoggedInUser(auth);
+//        if (userOptional.isEmpty()) {
+//            return "redirect:/login";
+//        }
+//
+//        AppUsuario user = userOptional.get();
+//        Long idUsuarioLogueado = user.getIdUsuario();
+//        //Busca solicitudes diferentes de estado 4, o sea, que no estén denegadas y que estén asignadas al usuario logueado
+//        List<Solicitud> autorizar = solicitudRepo.findSolicitudesAAutorizar(idUsuarioLogueado);
+//        // carga los listado para que se muestren los nombre y no los ID de los registros
+//        List<AppUsuario> usuarios = usuarioRepo.findAll();
+//        List<Categoria> categorias = categoriaRepo.findAll();
+//        List<Estado> estados = estadoRepo.findAll();
+//        List<Prioridad> prioridades = prioridadRepo.findAll();
+//
+//        model.addAttribute("autorizar", autorizar);
+//        model.addAttribute("usuarios", usuarios);
+//        model.addAttribute("categorias", categorias);
+//        model.addAttribute("estados", estados);
+//        model.addAttribute("prioridades", prioridades);
+//
+//        return "redirect:/index";
+//    }
 
 
     @PostMapping("/actualizarAutorizacion")
@@ -210,41 +220,41 @@ public class SolicitudController {
             @RequestParam(value = "comentario", required = false) String comentario,
             RedirectAttributes redirectAttributes) {
 
-        // Actualizar registro
-        solicitudRepo.actualizarEstado(idSolicitud, idEstado, comentario);
+        try {
+            solicitudRepo.actualizarEstado(idSolicitud, idEstado, comentario);
 
-        // Buscar la solicitud para enviar el correo
-        Solicitud sol = solicitudRepo.findById(idSolicitud).orElse(null);
-        if (sol != null && sol.getCorreo() != null) {
+            Solicitud sol = solicitudRepo.findById(idSolicitud).orElse(null);
+            if (sol != null && sol.getCorreo() != null) {
+                try {
+                    String nombreEstado = "ACTUALIZADO";
+                    Optional<Estado> estOpt = estadoRepo.findById(Long.valueOf(idEstado));
+                    if (estOpt.isPresent()) {
+                        nombreEstado = estOpt.get().getEstado();
+                    }
 
-
-            try {
-
-                String nombreEstado = "ACTUALIZADO";
-                Optional<Estado> estOpt = estadoRepo.findById(Long.valueOf(idEstado));
-                if (estOpt.isPresent()) {
-                    nombreEstado = estOpt.get().getEstado();
+                    emailService.enviarCorreoHtml(
+                            sol.getCorreo(),
+                            "Actualización de tu Solicitud #" + sol.getIdSolicitud(),
+                            sol.getIdSolicitud(),
+                            nombreEstado,
+                            comentario
+                    );
+                } catch (MessagingException e) {
+                    e.printStackTrace();
+                    System.out.println("Error enviando correo: " + e.getMessage());
                 }
-
-                emailService.enviarCorreoHtml(
-                        sol.getCorreo(),
-                        "Actualización de tu Solicitud #" + sol.getIdSolicitud(),
-                        sol.getIdSolicitud(),
-                        nombreEstado,
-                        comentario
-                );
-
-            } catch (MessagingException e) {
-                e.printStackTrace();
-                System.out.println("Error enviando correo: " + e.getMessage());
             }
-        }
 
-        redirectAttributes.addFlashAttribute("msg", "Solicitud actualizada correctamente");
+            redirectAttributes.addFlashAttribute("msg", "Estado de la solicitud actualizado.");
+            redirectAttributes.addFlashAttribute("tipo", "success");
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("msg", "Hubo un error al actualizar.");
+            redirectAttributes.addFlashAttribute("tipo", "error");
+        }
 
         return "redirect:/solicitud/autorizar";
     }
-
 
     @GetMapping("/descargar/{id}")
     public ResponseEntity<Resource> descargarAdjunto(@PathVariable Long id) {
@@ -360,14 +370,21 @@ public class SolicitudController {
 
                 solicitudRepo.deleteById(idSolicitud);
 
-                redirectAttributes.addFlashAttribute("mensaje", "Solicitud eliminada correctamente.");
+                //redirectAttributes.addFlashAttribute("mensaje", "Solicitud eliminada correctamente.");
+                redirectAttributes.addFlashAttribute("msg", "Solicitud eliminada correctamente.");
+                redirectAttributes.addFlashAttribute("tipo", "success");
+
             } else {
-                redirectAttributes.addFlashAttribute("error", "La solicitud no existe.");
+                //redirectAttributes.addFlashAttribute("error", "La solicitud no existe.");
+                redirectAttributes.addFlashAttribute("msg", "La solicitud no existe.");
+                redirectAttributes.addFlashAttribute("tipo", "warning");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "Error al intentar eliminar la solicitud.");
+            //redirectAttributes.addFlashAttribute("error", "Error al intentar eliminar la solicitud.");
+            redirectAttributes.addFlashAttribute("msg", "Error crítico al eliminar.");
+            redirectAttributes.addFlashAttribute("tipo", "error");
         }
 
         return "redirect:/solicitud/misSolicitudes";

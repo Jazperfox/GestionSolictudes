@@ -331,5 +331,50 @@
     });
 </script>
 
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // 1. Detectar mensajes flash del controlador
+    const msg = /*[[${msg}]]*/ null;
+    const tipo = /*[[${tipo}]]*/ null; // success, error, warning, info
+
+    if (msg) {
+        Swal.fire({
+            title: tipo === 'success' ? '¡Excelente!' : 'Atención',
+            text: msg,
+            icon: tipo || 'info',
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#2575fc',
+            timer: 4000, // Se cierra solo en 4 seg
+            timerProgressBar: true,
+            backdrop: `rgba(0,0,0,0.4)`
+        });
+    }
+
+    // 2. Función genérica para confirmar acciones (ej: Eliminar)
+    // Uso en HTML: onclick="confirmarEliminacion(event, 'formularioEliminarId')"
+    function confirmarEliminacion(event, formId) {
+        event.preventDefault(); // Detiene el envío automático
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Esta acción eliminará la solicitud permanentemente.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById(formId).submit(); // Envía el formulario manualmente
+            }
+        });
+    }
+    /*]]>*/
+</script>
+
 </body>
 </html>
