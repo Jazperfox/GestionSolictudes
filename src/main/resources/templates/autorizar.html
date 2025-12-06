@@ -206,8 +206,8 @@
                                 data-bs-toggle="modal"
                                 data-bs-target="#modalActualizar"
                                 th:attr="data-id=${solicitud.idSolicitud},
-                                         data-cat-nombre=${categorias.^[idCategoria == solicitud.idCategoriaSolicitud].nombre},
-                                         data-est-nombre=${estados.^[idEstado == solicitud.idEstadoSolicitud].estado}">
+                                         data-cat-nombre=${categorias.^[idCategoria == __${solicitud.idCategoriaSolicitud}__]?.nombre ?: 'Sin Categoría'},
+                                         data-est-nombre=${estados.^[idEstado == __${solicitud.idEstadoSolicitud}__]?.estado ?: 'Sin Estado'}">
                             <i class="bi bi-pencil-square me-1"></i> Gestionar
                         </button>
                     </td>
@@ -354,7 +354,7 @@
         return '';
     }
 
-    // Scripts de Modales (MODIFICADO)
+    // Scripts de Modales
     const modalAct = document.getElementById('modalActualizar');
     if(modalAct){
         modalAct.addEventListener('show.bs.modal', event => {

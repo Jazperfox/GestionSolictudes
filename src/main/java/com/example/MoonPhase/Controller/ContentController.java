@@ -82,9 +82,14 @@ public class ContentController {
             model.addAttribute("idUsuario", user.getIdUsuario());
             model.addAttribute("nombreUsuario", user.getNombreUsuario());
 
-            // Datos para el dashboard de ADMIN
             long tareasPendientes = solicitudRepository.countByIdUsuarioAndIdEstadoSolicitud(user.getIdUsuario(), 3L);
             model.addAttribute("tareasPendientes", tareasPendientes);
+
+            List<Solicitud> misTareasActivas = solicitudRepository.findMisPendientes(user.getIdUsuario());
+            model.addAttribute("misTareas", misTareasActivas);
+
+            List<Solicitud> misResueltas = solicitudRepository.findMisResueltas(user.getIdUsuario());
+            model.addAttribute("resueltas", misResueltas);
 
             List<Solicitud> misTareasRecientes = solicitudRepository.findTop5ByIdUsuarioOrderByFechaCreacionDesc(user.getIdUsuario());
             model.addAttribute("misTareas", misTareasRecientes);

@@ -174,7 +174,12 @@
             text: msg,
             icon: tipo || 'info',
             confirmButtonText: 'Aceptar',
-            confirmButtonColor: '#667eea'
+            confirmButtonColor: '#667eea',
+            allowOutsideClick: false
+        }).then((result)=>{
+            if (tipo === 'success') {
+                window.location.href = '/index';
+            }
         });
     }
 

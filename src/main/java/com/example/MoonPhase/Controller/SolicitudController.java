@@ -50,24 +50,30 @@ public class SolicitudController {
         this.ftpStorageService = ftpStorageService;
     }
 
+
+
     @GetMapping("/crear")
     public String mostrarFormulario(Model model) {
         model.addAttribute("categorias", categoriaRepo.findAll());
+        model.addAttribute("prioridades", prioridadRepo.findAll());
         model.addAttribute("solicitud", new Solicitud());
         return "crearSolicitud";
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Solicitud solicitud,@RequestParam("archivoAdjunto") MultipartFile file,
-                          RedirectAttributes redirectAttributes) {
+    public String guardar(@ModelAttribute Solicitud solicitud
+            ,@RequestParam("archivo") MultipartFile file,
+                          RedirectAttributes redirectAttributes,Authentication auth) {
 
         try{
-            //solicitud.setIdPrioridad(1L);
             solicitud.setIdEstadoSolicitud(1L);
             solicitud.setFechaCreacion(new java.sql.Date(System.currentTimeMillis()));
 
-            if(solicitud.getIdUsuarioCreacion()==null){
-                solicitud.setIdUsuarioCreacion(1L);
+            Optional<AppUsuario> usuarioLogueado=getLoggedInUser(auth);
+            if (usuarioLogueado.isPresent()) {
+                solicitud.setIdUsuarioCreacion(usuarioLogueado.get().getIdUsuario());
+            } else {
+                solicitud.setIdUsuarioCreacion(1L); // Fallback por si acaso
             }
 
             Solicitud solicitudGuardada=solicitudRepo.save(solicitud);
@@ -115,7 +121,7 @@ public class SolicitudController {
         }
 
        // solicitudRepo.save(solicitud);
-        return "redirect:/index";
+        return "redirect:/solicitud/crear";
     }
 
     @GetMapping("/pendientes")
