@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
@@ -116,7 +117,6 @@
                     <option value="todos">Todos</option>
                     <option value="EN PROCESO">En Proceso</option>
                     <option value="APROBADA">Aprobadas</option>
-
                     <option value="NEGADA">Negadas</option>
                 </select>
             </div>
@@ -205,7 +205,9 @@
                         <button class="btn btn-primary btn-sm rounded-pill px-3"
                                 data-bs-toggle="modal"
                                 data-bs-target="#modalActualizar"
-                                th:attr="data-id=${solicitud.idSolicitud}, data-estado=${solicitud.idEstadoSolicitud}">
+                                th:attr="data-id=${solicitud.idSolicitud},
+                                         data-cat-nombre=${categorias.^[idCategoria == solicitud.idCategoriaSolicitud].nombre},
+                                         data-est-nombre=${estados.^[idEstado == solicitud.idEstadoSolicitud].estado}">
                             <i class="bi bi-pencil-square me-1"></i> Gestionar
                         </button>
                     </td>
@@ -246,12 +248,15 @@
                 </div>
                 <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label text-secondary fw-bold small">ID Solicitud</label>
-                        <input type="text" id="modalIdSolicitud" name="idSolicitud" class="form-control bg-light" readonly>
+                        <input type="hidden" id="modalIdSolicitud" name="idSolicitud">
+
+                        <label class="form-label text-secondary fw-bold small">Categoría</label>
+                        <input type="text" id="modalCategoriaVisible" class="form-control bg-light" readonly>
                     </div>
                     <div class="mb-3">
                         <label class="form-label text-secondary fw-bold small">Estado Actual</label>
                         <input type="text" id="modalNombreEstado" class="form-control bg-light mb-2" readonly>
+
                         <label class="form-label text-primary fw-bold small mt-2">Nuevo Estado</label>
                         <select name="idEstado" class="form-select border-primary" required>
                             <option value="">-- Seleccionar Acción --</option>
@@ -296,25 +301,20 @@
 <script>
     // Variables globales
     const tbody = document.getElementById('cuerpoTabla');
-    // Guardamos las filas originales en memoria para poder restaurarlas y reordenarlas
     let filasOriginales = Array.from(document.querySelectorAll('.fila-dato'));
 
-    // Función principal que combina Filtrado y Agrupación
     function aplicarLogicaTabla() {
         const filtroEstado = document.getElementById('filtroEstado').value.toUpperCase();
         const criterioAgrupacion = document.getElementById('agruparPor').value;
 
-        // 1. FILTRADO: Determinar qué filas son visibles
         let filasVisibles = filasOriginales.filter(fila => {
             const textoEstado = fila.querySelector('.col-estado').textContent.trim().toUpperCase();
             if (filtroEstado === 'TODOS') return true;
-            return textoEstado.includes(filtroEstado); // 'includes' permite manejar ligeras variaciones
+            return textoEstado.includes(filtroEstado);
         });
 
-        // Actualizar contador
         document.getElementById('contadorRegistros').textContent = filasVisibles.length;
 
-        // 2. ORDENAMIENTO (Necesario para agrupar)
         if (criterioAgrupacion !== 'ninguno') {
             filasVisibles.sort((a, b) => {
                 let valA = obtenerValorCriterio(a, criterioAgrupacion);
@@ -322,28 +322,20 @@
                 return valA.localeCompare(valB);
             });
         } else {
-            // Si no hay agrupación, ordenar por ID (por defecto) o dejar orden original
             filasVisibles.sort((a, b) => {
-                // Asumiendo que el ID está en la primera celda
                 return parseInt(a.cells[0].textContent.replace('#','')) - parseInt(b.cells[0].textContent.replace('#',''));
             });
         }
 
-        // 3. RENDERIZADO CON AGRUPACIÓN
-        tbody.innerHTML = ''; // Limpiar tabla actual
+        tbody.innerHTML = '';
 
         if (criterioAgrupacion === 'ninguno') {
-            // Renderizado simple
             filasVisibles.forEach(fila => tbody.appendChild(fila));
         } else {
-            // Renderizado con filas de cabecera
             let grupoActual = null;
-
             filasVisibles.forEach(fila => {
                 const valorGrupo = obtenerValorCriterio(fila, criterioAgrupacion);
-
                 if (valorGrupo !== grupoActual) {
-                    // Insertar fila de título de grupo
                     const trHeader = document.createElement('tr');
                     trHeader.className = 'group-header';
                     trHeader.innerHTML = `<td colspan="8"><i class="bi bi-caret-down-fill me-2"></i>${criterioAgrupacion.toUpperCase()}: ${valorGrupo}</td>`;
@@ -355,7 +347,6 @@
         }
     }
 
-    // Helper para sacar el texto de la columna correcta
     function obtenerValorCriterio(fila, criterio) {
         if (criterio === 'fecha') return fila.querySelector('.col-fecha').textContent.trim();
         if (criterio === 'estado') return fila.querySelector('.col-estado').textContent.trim();
@@ -363,14 +354,21 @@
         return '';
     }
 
-    // Scripts de Modales (Mantenidos del original)
+    // Scripts de Modales (MODIFICADO)
     const modalAct = document.getElementById('modalActualizar');
     if(modalAct){
         modalAct.addEventListener('show.bs.modal', event => {
             const button = event.relatedTarget;
-            document.getElementById('modalIdSolicitud').value = button.getAttribute('data-id');
-            // Nota: Aquí solo mostramos el estado actual como texto simple ya que no tenemos el array JS de estados completo en este scope
-            // pero el input es solo lectura visual.
+
+            // 1. Obtener datos del botón
+            const idSolicitud = button.getAttribute('data-id');
+            const nombreCategoria = button.getAttribute('data-cat-nombre');
+            const nombreEstado = button.getAttribute('data-est-nombre');
+
+            // 2. Asignar valores a los inputs del Modal
+            document.getElementById('modalIdSolicitud').value = idSolicitud; // Oculto (para el POST)
+            document.getElementById('modalCategoriaVisible').value = nombreCategoria; // Visible
+            document.getElementById('modalNombreEstado').value = nombreEstado; // Visible
         });
     }
 
@@ -393,7 +391,6 @@
         }
     }
 
-    // Inicializar la tabla al cargar
     aplicarLogicaTabla();
 </script>
 

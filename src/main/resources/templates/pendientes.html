@@ -6,6 +6,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
 
     <style>
         /* Estilos Generales del Tema */
@@ -129,11 +130,16 @@
         <div class="card-body p-4">
             <div class="d-flex align-items-center mb-4">
                 <h4 class="card-title fw-bold mb-0 text-dark">Solicitudes Recientes</h4>
-                <span class="badge bg-primary rounded-pill ms-3 fs-6 px-3 py-2" th:text="${pendientes.size() + ' Nuevas'}">4 Nuevas</span>
+                <span class="badge bg-primary rounded-pill ms-3 fs-6 px-3 py-2" th:text="${pendientes.size() + ' Nuevas'}">0 Nuevas</span>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-borderless align-middle mb-0">
+            <div th:if="${pendientes.empty}" class="text-center text-muted py-5 bg-light rounded-3 shadow-sm mb-3">
+                <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
+                <p class="mb-0 lead">No hay solicitudes nuevas por asignar.</p>
+            </div>
+
+            <div th:unless="${pendientes.empty}" class="table-responsive">
+                <table class="table table-borderless align-middle mb-0 table-paginada">
                     <thead>
                     <tr>
                         <th>Solicitante</th>
@@ -145,13 +151,6 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:if="${pendientes.empty}">
-                        <td colspan="6" class="text-center text-muted py-5">
-                            <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
-                            No hay solicitudes nuevas por asignar.
-                        </td>
-                    </tr>
-
                     <tr th:each="solicitud : ${pendientes}">
                         <td>
                             <div class="d-flex align-items-center">
@@ -295,17 +294,15 @@
             icon: tipo || 'info',
             confirmButtonText: 'Entendido',
             confirmButtonColor: '#2575fc',
-            timer: 4000, // Se cierra solo en 4 seg
+            timer: 4000,
             timerProgressBar: true,
             backdrop: `rgba(0,0,0,0.4)`
         });
     }
 
-    // 2. Función genérica para confirmar acciones (ej: Eliminar)
-    // Uso en HTML: onclick="confirmarEliminacion(event, 'formularioEliminarId')"
+    // 2. Función genérica para confirmar acciones
     function confirmarEliminacion(event, formId) {
-        event.preventDefault(); // Detiene el envío automático
-
+        event.preventDefault();
         Swal.fire({
             title: '¿Estás seguro?',
             text: "Esta acción eliminará la solicitud permanentemente.",
@@ -317,11 +314,40 @@
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                document.getElementById(formId).submit(); // Envía el formulario manualmente
+                document.getElementById(formId).submit();
             }
         });
     }
     /*]]>*/
+</script>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Solo inicializa DataTables si la tabla existe en el DOM
+        if ($('.table-paginada').length > 0) {
+            $('.table-paginada').DataTable({
+                "pageLength": 10,
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ registros por página",
+                    "zeroRecords": "No se encontraron resultados",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay registros disponibles",
+                    "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                }
+            });
+        }
+    });
 </script>
 
 </body>

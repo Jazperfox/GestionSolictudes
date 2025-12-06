@@ -30,7 +30,7 @@ public class SolicitudController {
     private final AppUsuarioRepository usuarioRepo;
     private final EstadoRepository estadoRepo;
     private final PrioridadRepository prioridadRepo;
-    private EmailService emailService;
+    private final EmailService emailService;
     private final FtpStorageService ftpStorageService;
 
 
@@ -62,7 +62,7 @@ public class SolicitudController {
                           RedirectAttributes redirectAttributes) {
 
         try{
-            solicitud.setIdPrioridad(1L);
+            //solicitud.setIdPrioridad(1L);
             solicitud.setIdEstadoSolicitud(1L);
             solicitud.setFechaCreacion(new java.sql.Date(System.currentTimeMillis()));
 
@@ -185,32 +185,7 @@ public class SolicitudController {
         return "autorizar";
     }
 
-//    @GetMapping("/actualizar")
-//    public String actualizarAutorizacion(Model model, Authentication auth) {
-//
-//        Optional<AppUsuario> userOptional = getLoggedInUser(auth);
-//        if (userOptional.isEmpty()) {
-//            return "redirect:/login";
-//        }
-//
-//        AppUsuario user = userOptional.get();
-//        Long idUsuarioLogueado = user.getIdUsuario();
-//        //Busca solicitudes diferentes de estado 4, o sea, que no estén denegadas y que estén asignadas al usuario logueado
-//        List<Solicitud> autorizar = solicitudRepo.findSolicitudesAAutorizar(idUsuarioLogueado);
-//        // carga los listado para que se muestren los nombre y no los ID de los registros
-//        List<AppUsuario> usuarios = usuarioRepo.findAll();
-//        List<Categoria> categorias = categoriaRepo.findAll();
-//        List<Estado> estados = estadoRepo.findAll();
-//        List<Prioridad> prioridades = prioridadRepo.findAll();
-//
-//        model.addAttribute("autorizar", autorizar);
-//        model.addAttribute("usuarios", usuarios);
-//        model.addAttribute("categorias", categorias);
-//        model.addAttribute("estados", estados);
-//        model.addAttribute("prioridades", prioridades);
-//
-//        return "redirect:/index";
-//    }
+
 
 
     @PostMapping("/actualizarAutorizacion")
@@ -387,7 +362,7 @@ public class SolicitudController {
             redirectAttributes.addFlashAttribute("tipo", "error");
         }
 
-        return "redirect:/solicitud/misSolicitudes";
+        return "redirect:/solicitud/mis-solicitudes";
     }
 
 }
