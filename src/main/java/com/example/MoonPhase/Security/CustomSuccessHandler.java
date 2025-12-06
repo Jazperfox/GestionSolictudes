@@ -41,7 +41,11 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
                 response.sendRedirect("/indexadmin");
             } else if (usuario.getIdTipoUsuario() == 2) {
                 response.sendRedirect("/index");
-            } else {
+            }
+            else if(usuario.getIdTipoUsuario() == 3) {
+                response.sendRedirect("/indexAutoriza");
+            }
+            else {
                 // Por seguridad, si es otro número, mandamos a index
                 response.sendRedirect("/index");
             }

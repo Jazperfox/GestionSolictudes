@@ -1,47 +1,173 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.w3.org/1999/xhtml">
-<body>
-<h2>Solicitudes Sin Asignar</h2>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Solicitudes Pendientes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-<table class="table" border="1">
-    <thead>
-    <tr>
-        <th>ID Solicitud</th>
-        <th>ID Categoría</th>
-        <th>ID Creador</th>
-        <th>Fecha Creación</th>
-        <th>ID Estado</th>
-        <th>ID Prioridad</th>
-        <th>Asignar a:</th> </tr>
-    </thead>
-    <tbody>
-    <tr th:each="solicitud : ${pendientes}">
-        <td th:text="${solicitud.idSolicitud}">1</td>
-        <td th:text="${solicitud.idCategoriaSolicitud}">101</td>
-        <td th:text="${solicitud.idUsuarioCreacion}">5</td>
-        <td th:text="${solicitud.fechaCreacion}">2023-11-29</td>
-        <td th:text="${solicitud.idEstadoSolicitud}">1</td>
-        <td th:text="${solicitud.idPrioridad}">1</td>
+    <style>
+        /* Estilos para el visor de archivos en el modal */
+        #previewFrame {
+            width: 100%;
+            height: 500px;
+            border: none;
+        }
+        #previewImage {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="bg-light p-4">
 
-        <td>
-            <form th:action="@{/solicitud/asignar}" method="post">
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Asignación de Solicitudes</h2>
+        <a href="/indexadmin" class="btn btn-secondary">Volver</a>
+    </div>
 
-                <input type="hidden" name="idSolicitud" th:value="${solicitud.idSolicitud}" />
+    <div class="card shadow">
+        <div class="card-body">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Categoría</th>
+                    <th>Fecha</th>
+                    <th>Prioridad</th>
+                    <th>Archivo Adjunto</th> <th>Asignar Técnico</th>
+                </tr>
+                </thead>
+                <tbody>
 
-                <select name="idUsuario" required>
-                    <option value="">-- Seleccionar Usuario --</option>
-                    <option th:each="usuario : ${usuarios}"
-                            th:value="${usuario.idUsuario}"
-                            th:text="${usuario.nombreUsuario + ' (ID: ' + usuario.idUsuario + ')'}">
-                        Nombre Usuario (ID: 1)
-                    </option>
-                </select>
+                <tr th:if="${pendientes.empty}">
+                    <td colspan="6" class="text-center text-muted">No hay solicitudes nuevas por asignar.</td>
+                </tr>
 
-                <button type="submit">Asignar</button>
-            </form>
-        </td>
-    </tr>
-    </tbody>
-</table>
+                <tr th:each="solicitud : ${pendientes}">
+                    <td th:text="${solicitud.idSolicitud}" class="fw-bold"></td>
+                    <td th:text="${solicitud.idCategoriaSolicitud}"></td>
+                    <td th:text="${solicitud.fechaCreacion}"></td>
+
+                    <td>
+                        <span th:if="${solicitud.idPrioridad == 1}" class="badge bg-danger">Alta</span>
+                        <span th:if="${solicitud.idPrioridad == 2}" class="badge bg-warning text-dark">Media</span>
+                        <span th:if="${solicitud.idPrioridad == 3}" class="badge bg-success">Baja</span>
+                    </td>
+
+                    <td class="text-center">
+                        <div th:if="${solicitud.rutaAdjunto != null and !solicitud.rutaAdjunto.isEmpty()}"
+                             th:with="ruta=${solicitud.rutaAdjunto.toLowerCase()},
+                                      esImagen=${#strings.endsWith(ruta, '.jpg') or #strings.endsWith(ruta, '.jpeg') or #strings.endsWith(ruta, '.png')},
+                                      esPdf=${#strings.endsWith(ruta, '.pdf')}">
+
+                            <button th:if="${esImagen or esPdf}"
+                                    type="button"
+                                    class="btn btn-sm btn-outline-info"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalVisualizar"
+                                    title="Visualizar Archivo"
+                                    th:onclick="cargarPrevisualizacion([[${solicitud.idSolicitud}]], [[${esImagen}]])">
+                                <i class="bi bi-eye-fill"></i> Ver
+                            </button>
+
+                            <a th:unless="${esImagen or esPdf}"
+                               th:href="@{/solicitud/descargar/{id}(id=${solicitud.idSolicitud})}"
+                               class="btn btn-sm btn-outline-primary"
+                               title="Descargar Archivo">
+                                <i class="bi bi-download"></i> Bajar
+                            </a>
+                        </div>
+                        <span th:unless="${solicitud.rutaAdjunto != null and !solicitud.rutaAdjunto.isEmpty()}" class="text-muted">-</span>
+                    </td>
+
+                    <td>
+                        <form th:action="@{/solicitud/asignar}" method="post" class="d-flex gap-2">
+                            <input type="hidden" name="idSolicitud" th:value="${solicitud.idSolicitud}" />
+
+                            <select name="idUsuario" class="form-select form-select-sm" required style="width: 200px;">
+                                <option value="">Seleccionar...</option>
+                                <option th:each="usuario : ${usuarios}"
+                                        th:value="${usuario.idUsuario}"
+                                        th:text="${usuario.nombreUsuario}">
+                                </option>
+                            </select>
+
+                            <button type="submit" class="btn btn-success btn-sm">Asignar</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalVisualizar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Vista Previa del Archivo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body text-center bg-dark">
+                <img id="previewImage" src="" alt="Vista previa" style="display: none;">
+                <iframe id="previewFrame" src="" style="display: none;"></iframe>
+                <div id="loadingMsg" class="text-white">Cargando...</div>
+            </div>
+
+            <div class="modal-footer bg-light">
+                <a id="btnDescargarModal" href="#" class="btn btn-primary">
+                    <i class="bi bi-download"></i> Descargar
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function cargarPrevisualizacion(idSolicitud, esImagen) {
+        const urlVer = '/solicitud/ver-archivo/' + idSolicitud;
+        const urlDescargar = '/solicitud/descargar/' + idSolicitud;
+
+        const img = document.getElementById('previewImage');
+        const iframe = document.getElementById('previewFrame');
+        const loading = document.getElementById('loadingMsg');
+        const btnDescargar = document.getElementById('btnDescargarModal');
+
+        // Actualizar botón de descarga
+        btnDescargar.href = urlDescargar;
+
+        // Resetear visualización
+        img.style.display = 'none';
+        iframe.style.display = 'none';
+        loading.style.display = 'block';
+
+        if (esImagen) {
+            img.src = urlVer;
+            img.onload = function() { loading.style.display = 'none'; img.style.display = 'block'; };
+        } else {
+            iframe.src = urlVer;
+            // Para PDFs, ocultamos el loading directamente
+            loading.style.display = 'none';
+            iframe.style.display = 'block';
+        }
+    }
+
+    // Limpiar al cerrar
+    const modalVis = document.getElementById('modalVisualizar');
+    modalVis.addEventListener('hidden.bs.modal', function () {
+        document.getElementById('previewImage').src = "";
+        document.getElementById('previewFrame').src = "";
+    });
+</script>
+
 </body>
 </html>

@@ -9,13 +9,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import com.example.MoonPhase.Service.FtpStorageService;
 import org.springframework.web.multipart.MultipartFile;
-// import java.time.LocalDate;
-
+import org.springframework.http.MediaType;
 @Controller
 @RequestMapping("/solicitud")
 public class SolicitudController {
@@ -52,13 +56,33 @@ public class SolicitudController {
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Solicitud solicitud) {
+    public String guardar(@ModelAttribute Solicitud solicitud,@RequestParam("archivoAdjunto") MultipartFile file,
+                          RedirectAttributes redirectAttributes) {
 
-        solicitud.setIdPrioridad(1L);
-        solicitud.setIdEstadoSolicitud(1L);
-        solicitud.setFechaCreacion(new java.sql.Date(System.currentTimeMillis()));
+        try{
+            solicitud.setIdPrioridad(1L);
+            solicitud.setIdEstadoSolicitud(1L);
+            solicitud.setFechaCreacion(new java.sql.Date(System.currentTimeMillis()));
 
-        solicitudRepo.save(solicitud);
+            if(solicitud.getIdUsuarioCreacion()==null){
+                solicitud.setIdUsuarioCreacion(1L);
+            }
+
+            Solicitud solicitudGuardada=solicitudRepo.save(solicitud);
+            if(!file.isEmpty()){
+                String rutaFtp=ftpStorageService.subirArchivoSolicitud(file,solicitudGuardada.getIdSolicitud());
+
+                solicitudGuardada.setRutaAdjunto(rutaFtp);
+                solicitudRepo.save(solicitudGuardada);
+            }
+            redirectAttributes.addFlashAttribute("mensaje","Solicitud creada correctamente");
+        }catch (IOException e){
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error","Error al cargar solicitud");
+            return  "redirect:/index";
+        }
+
+       // solicitudRepo.save(solicitud);
         return "redirect:/index";
     }
 
@@ -67,7 +91,7 @@ public class SolicitudController {
         //Busca solicitudes pendientes con idusuario = null
         List<Solicitud> pendientes = solicitudRepo.findSolicitudesNoAsignadasJPQL();
         // Carga los usuarios
-        List<AppUsuario> usuarios = usuarioRepo.findAll();
+        List<AppUsuario> usuarios = usuarioRepo.findByIdTipoUsuario(1L);
 
         model.addAttribute("pendientes", pendientes);
         model.addAttribute("usuarios", usuarios);
@@ -189,5 +213,64 @@ public class SolicitudController {
 
         return "redirect:/solicitud/autorizar";
     }
+
+
+    @GetMapping("/descargar/{id}")
+    public ResponseEntity<Resource> descargarAdjunto(@PathVariable Long id) {
+        Solicitud solicitud = solicitudRepo.findById(id).orElse(null);
+
+        if (solicitud == null || solicitud.getRutaAdjunto() == null || solicitud.getRutaAdjunto().isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            Resource archivo = ftpStorageService.descargarArchivo(solicitud.getRutaAdjunto());
+
+            // Extraer nombre del archivo de la ruta
+            String nombreArchivo = solicitud.getRutaAdjunto().substring(solicitud.getRutaAdjunto().lastIndexOf("/") + 1);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + nombreArchivo + "\"")
+                    .body(archivo);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/ver-archivo/{id}")
+    public ResponseEntity<Resource> verAdjunto(@PathVariable Long id) {
+        Solicitud solicitud = solicitudRepo.findById(id).orElse(null);
+
+        if (solicitud == null || solicitud.getRutaAdjunto() == null || solicitud.getRutaAdjunto().isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            Resource archivo = ftpStorageService.descargarArchivo(solicitud.getRutaAdjunto());
+            String nombreArchivo = solicitud.getRutaAdjunto();
+
+            MediaType contentType = MediaType.APPLICATION_OCTET_STREAM; // Por defecto
+            String extension = nombreArchivo.substring(nombreArchivo.lastIndexOf(".") + 1).toLowerCase();
+
+            switch (extension) {
+                case "pdf": contentType = MediaType.APPLICATION_PDF; break;
+                case "png": contentType = MediaType.IMAGE_PNG; break;
+                case "jpg":
+                case "jpeg": contentType = MediaType.IMAGE_JPEG; break;
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(contentType)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + nombreArchivo + "\"")
+                    .body(archivo);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+
 
 }

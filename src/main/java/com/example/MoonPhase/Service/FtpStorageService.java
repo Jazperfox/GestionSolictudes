@@ -9,6 +9,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import java.io.ByteArrayOutputStream;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import java.io.ByteArrayOutputStream;
+
 
 @Service
 public class FtpStorageService {
@@ -82,25 +89,65 @@ public class FtpStorageService {
     }
 
     // Método auxiliar para crear directorios anidados si no existen
+    // Método auxiliar mejorado con logs y manejo de errores
     private void crearDirectorios(FTPClient ftpClient, String rutaPath) throws IOException {
-        String[] directorios = rutaPath.split("/");
-        if (directorios.length > 0) {
-            // Intentar ir al directorio raíz primero si la ruta empieza con /
-            if(rutaPath.startsWith("/")) {
-                ftpClient.changeWorkingDirectory("/");
-            }
+        // Normalizar ruta para evitar problemas con dobles barras
+        if (rutaPath.startsWith("/")) {
+            ftpClient.changeWorkingDirectory("/");
+        }
 
-            for (String dir : directorios) {
-                if (!dir.isEmpty()) {
-                    boolean existe = ftpClient.changeWorkingDirectory(dir);
-                    if (!existe) {
-                        if (!ftpClient.makeDirectory(dir)) {
-                            throw new IOException("No se pudo crear el directorio: " + dir);
-                        }
-                        ftpClient.changeWorkingDirectory(dir);
+        String[] directorios = rutaPath.split("/");
+
+        for (String dir : directorios) {
+            if (!dir.isEmpty()) {
+                // Intentar cambiar al directorio
+                boolean existe = false;
+                try {
+                    existe = ftpClient.changeWorkingDirectory(dir);
+                } catch (IOException e) {
+                    // Si el servidor corta la conexión en un 550, lo capturamos aquí
+                    System.out.println("Aviso: El servidor lanzó error al buscar directorio '" + dir + "': " + e.getMessage());
+                    existe = false;
+                }
+
+                if (!existe) {
+                    System.out.println("El directorio '" + dir + "' no existe. Intentando crear...");
+                    if (!ftpClient.makeDirectory(dir)) {
+                        throw new IOException("No se pudo crear el directorio: " + dir + ". Verifique permisos del usuario FTP.");
+                    }
+                    if (!ftpClient.changeWorkingDirectory(dir)) {
+                        throw new IOException("Se creó el directorio '" + dir + "' pero no se pudo acceder a él.");
                     }
                 }
             }
         }
     }
+
+
+    public Resource descargarArchivo(String rutaFtp) throws IOException {
+        FTPClient ftpClient = new FTPClient();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        try {
+            ftpClient.connect(server, port);
+            ftpClient.login(user, password);
+            ftpClient.enterLocalPassiveMode();
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+            if(!ftpClient.retrieveFile(rutaFtp, outputStream)) {
+                throw new IOException("No se pudo descargar el archivo: " + rutaFtp);
+            }
+
+            return new ByteArrayResource(outputStream.toByteArray());
+
+        } finally {
+            if (ftpClient.isConnected()) {
+                ftpClient.logout();
+                ftpClient.disconnect();
+            }
+            outputStream.close(); // Buena práctica, aunque en ByteArrayOutputStream es no-op
+        }
+    }
+
+
 }

@@ -1,22 +1,47 @@
-<form th:action="@{/solicitud/guardar}" th:object="${solicitud}" method="post">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Solicitud</title>
+</head>
+<body>
+<h2>Nueva Solicitud</h2>
 
-    <label>Categoría:</label>
+<div th:if="${mensaje}" th:text="${mensaje}" style="color: green;"></div>
+<div th:if="${error}" th:text="${error}" style="color: red;"></div>
 
+<form th:action="@{/solicitud/guardar}"
+      th:object="${solicitud}"
+      method="post"
+      enctype="multipart/form-data">
 
-<select th:field="*{idCategoriaSolicitud}" required>
-    <option value="">Seleccione...</option>
-    <th:block th:each="cat : ${categorias}">
-        <option th:value="${cat.idCategoria}" th:text="${cat.nombre}"></option>
-    </th:block>
-</select>
+    <div>
+        <label>Categoría:</label>
+        <select th:field="*{idCategoriaSolicitud}" required>
+            <option value="">Seleccione...</option>
+            <th:block th:each="cat : ${categorias}">
+                <option th:value="${cat.idCategoria}" th:text="${cat.nombre}"></option>
+            </th:block>
+        </select>
+    </div>
 
-    <label>Prioridad:</label>
-    <select th:field="*{idPrioridad}" required>
-        <option value="">Seleccione...</option>
-        <option value="1">Alta</option>
-        <option value="2">Media</option>
-        <option value="3">Baja</option>
-    </select>
+    <div>
+        <label>Prioridad:</label>
+        <select th:field="*{idPrioridad}" required>
+            <option value="">Seleccione...</option>
+            <option value="1">Alta</option>
+            <option value="2">Media</option>
+            <option value="3">Baja</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="archivoAdjunto">Archivo Adjunto (Imagen o Documento):</label>
+        <input type="file" id="archivoAdjunto" name="archivoAdjunto" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx">
+    </div>
+    <br>
 
     <button type="submit">Guardar Solicitud</button>
 </form>
+</body>
+</html>
