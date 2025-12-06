@@ -9,7 +9,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import com.example.MoonPhase.Model.AppUsuario;
-import com.example.MoonPhase.Model.AppUsuarioRepository; // Importa tu repositorio
+import com.example.MoonPhase.Repository.AppUsuarioRepository; // Importa tu repositorio
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

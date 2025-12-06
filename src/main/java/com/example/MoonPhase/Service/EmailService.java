@@ -1,4 +1,4 @@
-package com.example.MoonPhase.Model;
+package com.example.MoonPhase.Service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

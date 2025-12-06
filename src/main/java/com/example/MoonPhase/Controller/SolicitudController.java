@@ -1,9 +1,10 @@
 package com.example.MoonPhase.Controller;
 
 import com.example.MoonPhase.Model.*;
+import com.example.MoonPhase.Repository.*;
+import com.example.MoonPhase.Service.EmailService;
 import com.example.MoonPhase.Service.FtpStorageService;
 import jakarta.mail.MessagingException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,9 +18,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import com.example.MoonPhase.Service.FtpStorageService;
+
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.http.MediaType;
+
 @Controller
 @RequestMapping("/solicitud")
 public class SolicitudController {
@@ -28,7 +29,7 @@ public class SolicitudController {
     private final AppUsuarioRepository usuarioRepo;
     private final EstadoRepository estadoRepo;
     private final PrioridadRepository prioridadRepo;
-    private  EmailService emailService;
+    private EmailService emailService;
     private final FtpStorageService ftpStorageService;
 
 

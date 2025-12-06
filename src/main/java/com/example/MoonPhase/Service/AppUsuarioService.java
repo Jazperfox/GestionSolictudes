@@ -1,7 +1,9 @@
-package com.example.MoonPhase.Model;
+package com.example.MoonPhase.Service;
 
 import java.util.Optional;
 
+import com.example.MoonPhase.Model.AppUsuario;
+import com.example.MoonPhase.Repository.AppUsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

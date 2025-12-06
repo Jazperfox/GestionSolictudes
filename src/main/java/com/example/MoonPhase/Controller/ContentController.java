@@ -3,6 +3,10 @@ package com.example.MoonPhase.Controller;
 import java.util.Optional;
 
 import com.example.MoonPhase.Model.*;
+import com.example.MoonPhase.Repository.AppUsuarioRepository;
+import com.example.MoonPhase.Repository.CategoriaSolicitudRepository;
+import com.example.MoonPhase.Repository.PrioridadRepository;
+import com.example.MoonPhase.Repository.SolicitudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

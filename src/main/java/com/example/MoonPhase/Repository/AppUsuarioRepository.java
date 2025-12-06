@@ -1,7 +1,9 @@
-package com.example.MoonPhase.Model;
+package com.example.MoonPhase.Repository;
 
 import java.util.List;
 import java.util.Optional;
+
+import com.example.MoonPhase.Model.AppUsuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
