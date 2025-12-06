@@ -20,6 +20,10 @@ public class Solicitud {
     @Column(name = "IdUsuarioCreacion", nullable = false)
     private Long idUsuarioCreacion;
 
+    @ManyToOne
+    @JoinColumn(name = "IdUsuarioCreacion", insertable = false, updatable = false)
+    private AppUsuario usuarioCreacion;
+
     @Column(name = "FechaCreacion", nullable = false)
     private Date fechaCreacion;
 
