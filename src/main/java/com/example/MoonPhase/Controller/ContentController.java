@@ -2,21 +2,31 @@ package com.example.MoonPhase.Controller;
 
 import java.util.Optional;
 
+import com.example.MoonPhase.Model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.example.MoonPhase.Model.AppUsuario;
-import com.example.MoonPhase.Model.AppUsuarioRepository;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class ContentController {
 
     @Autowired
     private AppUsuarioRepository usuarioRepository;
+    @Autowired
+    private SolicitudRepository solicitudRepository;
+
+    @Autowired
+    private CategoriaSolicitudRepository categoriaRepo;
+
+    @Autowired
+    private PrioridadRepository prioridadRepo;
 
     private Optional<AppUsuario> getLoggedInUser(Authentication auth) {
         if (auth == null) {
@@ -68,6 +78,15 @@ public class ContentController {
             model.addAttribute("idUsuario", user.getIdUsuario());
             model.addAttribute("nombreUsuario", user.getNombreUsuario());
 
+            long tareasPendientes = solicitudRepository.countByIdUsuarioAndIdEstadoSolicitud(user.getIdUsuario(), 3L);
+            model.addAttribute("tareasPendientes", tareasPendientes);
+
+            List<Solicitud> misTareasRecientes = solicitudRepository.findTop5ByIdUsuarioOrderByFechaCreacionDesc(user.getIdUsuario());
+            model.addAttribute("misTareas", misTareasRecientes);
+
+            model.addAttribute("categorias", categoriaRepo.findAll()); // Asegúrate de inyectar categoriaRepo en este Controller si no está
+            model.addAttribute("prioridades", prioridadRepo.findAll());
+
             return "indexadmin";
         }
 
@@ -84,6 +103,23 @@ public class ContentController {
 
             model.addAttribute("idUsuario", user.getIdUsuario());
             model.addAttribute("nombreUsuario", user.getNombreUsuario());
+
+            long pendientes = solicitudRepository.countByIdUsuarioIsNull();
+            model.addAttribute("cantPendientes", pendientes);
+
+            List<AppUsuario> tecnicos = usuarioRepository.findByIdTipoUsuario(1L);
+            Map<String, Long> cargaTrabajo = new HashMap<>();
+
+            for (AppUsuario tech : tecnicos) {
+                long tareasActivas = solicitudRepository.countByIdUsuarioAndIdEstadoSolicitud(tech.getIdUsuario(), 3L);
+                cargaTrabajo.put(tech.getNombreUsuario(), tareasActivas);
+            }
+            model.addAttribute("cargaTrabajo", cargaTrabajo);
+
+            List<Solicitud> ultimasPendientes = solicitudRepository.findTop5ByIdUsuarioIsNullOrderByFechaCreacionDesc();
+            model.addAttribute("ultimasPendientes", ultimasPendientes);
+
+            model.addAttribute("usuarios", usuarioRepository.findAll());
 
             return "indexAutoriza";
         }

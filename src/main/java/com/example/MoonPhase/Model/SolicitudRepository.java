@@ -26,6 +26,14 @@ public interface SolicitudRepository extends JpaRepository<Solicitud, Long> {
     @Query("SELECT s FROM Solicitud s WHERE s.idUsuarioCreacion = :idUsuario AND s.idEstadoSolicitud IN (2, 4)")
     List<Solicitud> findMisSolicitudesHistorial(@Param("idUsuario") Long idUsuario);
 
+    long countByIdUsuarioIsNull();
+
+    long countByIdUsuarioAndIdEstadoSolicitud(Long idUsuario, Long idEstado);
+
+    List<Solicitud> findTop5ByIdUsuarioIsNullOrderByFechaCreacionDesc();
+
+    List<Solicitud> findTop5ByIdUsuarioOrderByFechaCreacionDesc(Long idUsuario);
+
     @Modifying
     @Transactional
     @Query("UPDATE Solicitud s SET s.idEstadoSolicitud = :estado, s.comentario = :comentario WHERE s.idSolicitud = :idSolicitud")

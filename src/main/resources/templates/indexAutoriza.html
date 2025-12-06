@@ -1,89 +1,307 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Home Page</title>
+    <title>Panel de Asignación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
         }
 
-        header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px 10px;
-            text-align: center;
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 1.5rem;
+            color: #2d3748;
+            font-size: 0.9rem;
         }
 
-        nav {
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* HEADER FLOTANTE */
+        .top-bar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 0.8rem 1.5rem;
             display: flex;
-            justify-content: center;
-            background-color: #333;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.5rem;
         }
 
-        nav a {
+        .user-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-right: 0.8rem;
+        }
+
+        .btn-logout {
+            background-color: #f56565;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background-color: #c53030;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
+        }
+
+        /* BANNER PRINCIPAL */
+        .dashboard-banner {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            color: white;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-banner::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at top right, rgba(255,255,255,0.1), transparent);
+        }
+
+        .dashboard-banner h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.3rem;
+        }
+
+        /* TARJETAS DE CONTENIDO */
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            height: 100%;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .content-card:hover {
+            transform: translateY(-3px);
+        }
+
+        /* CONTADORES Y ELEMENTOS */
+        .counter-big {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #667eea;
+            line-height: 1;
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #edf2f7;
+        }
+
+        /* TABLA COMPACTA */
+        .table-custom th {
+            background-color: #f7fafc;
+            color: #718096;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            padding: 0.8rem;
+            border: none;
+        }
+
+        .table-custom td {
+            border-bottom: 1px solid #edf2f7;
+            padding: 0.8rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-action {
+            background: white;
+            border: 2px solid #e2e8f0;
+            color: #4a5568;
+            border-radius: 10px;
+            padding: 0.4rem 1rem;
+            font-weight: 600;
             text-decoration: none;
-            text-align: center;
+            display: inline-block;
+            transition: all 0.3s;
+            font-size: 0.9rem;
         }
 
-        nav a:hover {
-            background-color: #ddd;
-            color: black;
-        }
-
-        main {
-            padding: 20px;
+        .btn-action:hover {
+            border-color: #667eea;
+            color: #667eea;
+            background: #f7fafc;
         }
 
         footer {
-            background-color: #333;
-            color: white;
             text-align: center;
-            padding: 10px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+            color: rgba(255,255,255,0.8);
+            margin-top: 2rem;
+            font-size: 0.8rem;
         }
     </style>
 </head>
 <body>
-<header>
-    <h1>MoonPhase</h1>
-    <div align="right">
-        <p>
-            ¡Hola, <span th:text="${nombreUsuario}">[Nombre]</span>!
-            Tu ID de usuario es: <span th:text="${idUsuario}">[ID]</span>
-        </p>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="btn btn-danger">
+
+<div class="main-container">
+
+    <div class="top-bar">
+        <div class="d-flex align-items-center">
+            <div class="user-badge">
+                <i class="bi bi-person-fill"></i>
+            </div>
+            <div>
+                <h2 class="h6 mb-0 fw-bold">¡Bienvenido, <span th:text="${nombreUsuario}">Usuario</span>!</h2>
+                <small class="text-muted" style="font-size: 0.8rem;">Usuario: <span th:text="${nombreUsuario}">Nombre</span> | Rol: Asignador</small>
+            </div>
+        </div>
+        <form th:action="@{/logout}" method="post" class="m-0">
+            <button type="submit" class="btn-logout">
                 Cerrar Sesión
             </button>
         </form>
     </div>
-</header>
-<nav>
-    <a href="/solicitud/pendientes">Solicitudes pendiente</a>
-<!--    <a href="#about">About</a>-->
-<!--    <a href="#services">Services</a>-->
-<!--    <a href="#contact">Contact</a>-->
-</nav>
-<main>
-<!--    <p>-->
-<!--        ¡Hola, <span th:text="${nombreUsuario}">[Nombre]</span>!-->
-<!--        Tu ID de usuario es: <span th:text="${idUsuario}">[ID]</span>-->
-<!--    </p>-->
 
-<!--    <a href="/solicitud/crear">Crear nueva solicitud</a>-->
+    <div class="dashboard-banner">
+        <h1 class="fw-bold">Panel de Control</h1>
+        <p class="mb-0 opacity-75 small">Gestiona la asignación de solicitudes y monitorea la carga del equipo técnico.</p>
+    </div>
 
-</main>
-<footer>
-    <p>MoonPhase &copy; 2025</p>
-</footer>
+    <div class="row g-3 mb-3">
+
+        <div class="col-md-4">
+            <div class="content-card text-center d-flex flex-column justify-content-center align-items-center">
+                <div class="mb-2 text-warning card-icon">
+                    <i class="bi bi-bell-fill"></i>
+                </div>
+                <h3 class="h6 text-muted mb-1">Solicitudes Nuevas</h3>
+                <div class="counter-big mb-2" th:text="${cantPendientes}">0</div>
+                <p class="text-muted mb-3" style="font-size: 0.8rem;">Esperando ser asignadas</p>
+
+                <a href="/solicitud/pendientes" class="btn-action w-100">
+                    <i class="bi bi-arrow-right-circle-fill"></i> Ir a Asignar
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="content-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="h6 fw-bold mb-0 text-secondary"><i class="bi bi-people-fill me-2"></i>Carga del Equipo</h3>
+                    <span class="badge bg-light text-dark border" style="font-weight: normal;">En tiempo real</span>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    <div th:each="entry : ${cargaTrabajo}">
+                        <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
+                            <span class="fw-bold" th:text="${entry.key}">Técnico</span>
+                            <small class="text-muted fw-bold" th:text="${entry.value + ' tareas'}">0</small>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar"
+                                 th:style="'width: ' + (${entry.value} * 10) + '%'"
+                                 th:classappend="${entry.value > 5 ? 'bg-danger' : (entry.value > 2 ? 'bg-warning' : 'bg-success')}"
+                                 style="background: linear-gradient(90deg, #667eea, #764ba2);">
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${cargaTrabajo.empty}" class="text-center text-muted py-3">
+                        <i class="bi bi-info-circle"></i> <small>No hay técnicos registrados.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h4 class="h6 fw-bold text-secondary mb-3 text-uppercase ls-1" style="font-size: 0.8rem;">Últimas Solicitudes Recibidas</h4>
+        <div class="table-responsive">
+            <table class="table table-custom align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>Solicitante</th>
+                    <th>Fecha Creación</th>
+                    <th>Estado</th>
+                    <th>Prioridad</th>
+                    <th class="text-end">Acción</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${ultimasPendientes.empty}">
+                    <td colspan="5" class="text-center py-3 text-muted small">Todo al día. No hay solicitudes nuevas.</td>
+                </tr>
+                <tr th:each="sol : ${ultimasPendientes}">
+
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="user-badge bg-light text-primary d-flex align-items-center justify-content-center me-2"
+                                 style="width: 30px; height: 30px; font-size: 0.8rem;">
+                                <i class="bi bi-person"></i>
+                            </div>
+                            <span class="fw-bold text-primary"
+                                  th:each="u : ${usuarios}"
+                                  th:if="${u.idUsuario == sol.idUsuarioCreacion}"
+                                  th:text="${u.nombreUsuario}">
+                                    Usuario
+                                </span>
+                        </div>
+                    </td>
+
+                    <td th:text="${sol.fechaCreacion}">Fecha</td>
+                    <td><span class="badge bg-light text-dark border fw-normal">Nueva</span></td>
+                    <td>
+                        <span th:if="${sol.idPrioridad == 1}" class="text-danger fw-bold small"><i class="bi bi-circle-fill me-1" style="font-size: 6px;"></i>Alta</span>
+                        <span th:if="${sol.idPrioridad == 2}" class="text-warning fw-bold small"><i class="bi bi-circle-fill me-1" style="font-size: 6px;"></i>Media</span>
+                        <span th:if="${sol.idPrioridad == 3}" class="text-success fw-bold small"><i class="bi bi-circle-fill me-1" style="font-size: 6px;"></i>Baja</span>
+                    </td>
+                    <td class="text-end">
+                        <a href="/solicitud/pendientes" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-0" style="font-size: 0.8rem;">
+                            Gestionar
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <footer>
+        <p>© 2025 Proyecto UTEC - Universidad Tecnológica</p>
+    </footer>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
