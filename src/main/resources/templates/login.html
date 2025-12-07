@@ -13,22 +13,23 @@
     <section>
         
         <form th:action="@{/login}" action="/login" method="post">
-            <h1>Login</h1>
+            <h1>MoonPhase</h1>
+            <h3>Inicio de sesion</h3>
             <div class="dialog-row">
                 <label th:if="${param.error}" th:text="${session['SPRING_SECURITY_LAST_EXCEPTION'].message}" class="text-center redText"></label>                   
             </div>
             <div class="inputbox">
                 <ion-icon name="email-outline"></ion-icon>
                 <input name="username" id="username"type="name" required>
-                <label for="">username</label>
+                <label for="">Usuario</label>
             </div>
             <div class="inputbox">
                 <ion-icon name="lock-closed-outline"></ion-icon>
                 <input name="password" type="password" id="password" required>
-                <label for="">Password</label>
+                <label for="">Contraseña</label>
             </div>
             
-            <button>Log in</button>
+            <button>Ingresar</button>
             
         </form>
     </section>
