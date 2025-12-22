@@ -9,7 +9,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import com.example.MoonPhase.Model.AppUsuario;
-import com.example.MoonPhase.Repository.AppUsuarioRepository; // Importa tu repositorio
+import com.example.MoonPhase.Repository.AppUsuarioRepository;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,17 +26,13 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
         
-        // 1. Obtenemos el username del usuario que acaba de loguearse
         String username = authentication.getName();
 
-        // 2. Buscamos sus datos completos en la BD usando tu repositorio
         Optional<AppUsuario> userOptional = usuarioRepository.findByNombreUsuario(username);
 
-        // 3. Verificamos el tipo y redireccionamos
         if (userOptional.isPresent()) {
             AppUsuario usuario = userOptional.get();
 
-            // Lógica solicitada: 1 -> index, 2 -> indexadmin
             if (usuario.getIdTipoUsuario() == 1) {
                 response.sendRedirect("/indexadmin");
             } else if (usuario.getIdTipoUsuario() == 2) {
@@ -46,11 +42,9 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
                 response.sendRedirect("/indexAutoriza");
             }
             else {
-                // Por seguridad, si es otro número, mandamos a index
                 response.sendRedirect("/index");
             }
         } else {
-            // Caso raro: se logueó pero no se encuentra en BD (improbable)
             response.sendRedirect("/login?error");
         }
     }

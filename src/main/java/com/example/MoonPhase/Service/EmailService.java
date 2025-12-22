@@ -26,16 +26,13 @@ public class EmailService {
                                  Long idSolicitud, String nombreEstado, String comentario)
             throws MessagingException {
 
-        // Cargar variables para la plantilla
         Context context = new Context();
         context.setVariable("idSolicitud", idSolicitud);
         context.setVariable("estado", nombreEstado);
         context.setVariable("comentario", comentario);
 
-        // Procesar el archivo correoSolicitud.html
         String contenidoHtml = templateEngine.process("emailSolicitud", context);
 
-        // Crear correo tipo HTML
         MimeMessage mensaje = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mensaje, true, "UTF-8");
 

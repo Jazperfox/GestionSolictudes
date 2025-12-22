@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-// IMPORTANTE: Tus repositorios están en el paquete Model según tus archivos
 import com.example.MoonPhase.Model.*;
 
 import org.springframework.security.core.Authentication;
@@ -55,7 +54,6 @@ public class ContentController {
             return "redirect:/login";
         }
 
-        // Enviar ID y Nombre correctos del usuario logueado
         model.addAttribute("idUsuario", userOptional.get().getIdUsuario());
         model.addAttribute("nombreUsuario", userOptional.get().getNombreUsuario());
 
@@ -113,13 +111,9 @@ public class ContentController {
             model.addAttribute("idUsuario", user.getIdUsuario());
             model.addAttribute("nombreUsuario", user.getNombreUsuario());
 
-            // --- ESTO ES LO NUEVO QUE ARREGLA EL ERROR ---
-
-            // 1. Contador grande
             long pendientes = solicitudRepository.countByIdUsuarioIsNull();
             model.addAttribute("cantPendientes", pendientes);
 
-            // 2. Carga de trabajo (Esto faltaba y causaba el error null en el HTML)
             List<AppUsuario> tecnicos = usuarioRepository.findByIdTipoUsuario(1L);
             Map<String, Long> cargaTrabajo = new HashMap<>();
 
@@ -129,11 +123,9 @@ public class ContentController {
             }
             model.addAttribute("cargaTrabajo", cargaTrabajo);
 
-            // 3. Tabla inferior de últimas solicitudes
             List<Solicitud> ultimasPendientes = solicitudRepository.findTop5ByIdUsuarioIsNullOrderByFechaCreacionDesc();
             model.addAttribute("ultimasPendientes", ultimasPendientes);
 
-            // 4. Lista de usuarios para traducir IDs a Nombres en la tabla
             model.addAttribute("usuarios", usuarioRepository.findAll());
 
             return "indexAutoriza";

@@ -2,7 +2,6 @@ package com.example.MoonPhase.Model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.sql.Date;
 
 @Data
@@ -38,6 +37,9 @@ public class Solicitud {
 
     @Column(name = "Comentario", nullable = true)
     private String comentario;
+
+    @Column(name = "Descripcion", columnDefinition = "TEXT")
+    private String descripcion;
 
     @Column(name = "correoSeguimiento", nullable = true)
     private String correo;

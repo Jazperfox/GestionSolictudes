@@ -40,13 +40,11 @@ public class MensajeriaController {
         AppUsuario yo = getLoggedUser(auth);
         if (yo == null) return "redirect:/login";
 
-        // 1. Cargar lista de contactos (todos menos yo)
         List<AppUsuario> contactos = usuarioRepo.findAll();
         contactos.removeIf(u -> u.getIdUsuario().equals(yo.getIdUsuario()));
         model.addAttribute("contactos", contactos);
         model.addAttribute("usuarioActual", yo);
 
-        // 2. Si hay un chat seleccionado, cargar mensajes
         if (idSeleccionado != null) {
             Optional<AppUsuario> dest = usuarioRepo.findById(idSeleccionado);
             if (dest.isPresent()) {

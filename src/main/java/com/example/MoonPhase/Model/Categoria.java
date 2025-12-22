@@ -23,7 +23,6 @@ public class Categoria {
         this.nombre = nombre;
     }
 
-    // Getts y Setts
     public Long getIdCategoria() { return idCategoria; }
     public String getNombre() { return nombre; }
     public String getDescripcion() { return descripcion; }

@@ -55,20 +55,18 @@ public class Securityconfig {
             .headers(headers->headers
                     .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
             .authorizeHttpRequests(registry -> {
-                registry.requestMatchers("/login", "/css/**", "/js/**").permitAll(); // ← Agregar /login
+                registry.requestMatchers("/login", "/css/**", "/js/**").permitAll();
                 registry.anyRequest().authenticated();
             })
             .formLogin(form -> form
                 .loginPage("/login")
                 .permitAll()
-                //.defaultSuccessUrl("/index", true)
                 .successHandler(customSuccessHandler)
             )
 
             .logout(logout -> logout
               .permitAll()
-              // Redirige a la página de login con un parámetro para mostrar un mensaje si es necesario
-              .logoutSuccessUrl("/login?logout") 
+              .logoutSuccessUrl("/login?logout")
             )
             .build();
   }

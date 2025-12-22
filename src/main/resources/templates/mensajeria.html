@@ -29,7 +29,6 @@
             overflow: hidden;
         }
 
-        /* --- BARRA LATERAL (CONTACTOS) --- */
         .sidebar {
             width: 320px;
             background-color: #f8fafc;
@@ -113,7 +112,6 @@
 
         .contact-item.active .avatar { background: rgba(255,255,255,0.2); }
 
-        /* --- ZONA DE CHAT --- */
         .chat-area {
             flex: 1;
             display: flex;
@@ -314,13 +312,11 @@
 </div>
 
 <script>
-    // Scroll al final del chat automáticamente
     window.onload = function() {
         var objDiv = document.getElementById("msgContainer");
         if(objDiv) objDiv.scrollTop = objDiv.scrollHeight;
     }
 
-    // Buscador de usuarios simple
     function filtrarUsuarios() {
         var input, filter, container, a, i, txtValue;
         input = document.getElementById("buscador");

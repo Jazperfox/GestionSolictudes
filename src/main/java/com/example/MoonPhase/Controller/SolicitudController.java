@@ -73,7 +73,7 @@ public class SolicitudController {
             if (usuarioLogueado.isPresent()) {
                 solicitud.setIdUsuarioCreacion(usuarioLogueado.get().getIdUsuario());
             } else {
-                solicitud.setIdUsuarioCreacion(1L); // Fallback por si acaso
+                solicitud.setIdUsuarioCreacion(1L);
             }
 
             Solicitud solicitudGuardada=solicitudRepo.save(solicitud);
@@ -105,14 +105,12 @@ public class SolicitudController {
                 }
             }
 
-            //redirectAttributes.addFlashAttribute("mensaje","Solicitud creada correctamente");
 
             redirectAttributes.addFlashAttribute("msg", "¡Solicitud creada exitosamente!");
             redirectAttributes.addFlashAttribute("tipo", "success");
 
         }catch (IOException e){
             e.printStackTrace();
-            //redirectAttributes.addFlashAttribute("error","Error al cargar solicitud");
             redirectAttributes.addFlashAttribute("msg", "Error al cargar el archivo o guardar la solicitud.");
             redirectAttributes.addFlashAttribute("tipo", "error");
 
@@ -120,7 +118,6 @@ public class SolicitudController {
             return  "redirect:/solicitud/crear";
         }
 
-       // solicitudRepo.save(solicitud);
         return "redirect:/solicitud/crear";
     }
 
@@ -248,7 +245,6 @@ public class SolicitudController {
         try {
             Resource archivo = ftpStorageService.descargarArchivo(solicitud.getRutaAdjunto());
 
-            // Extraer nombre del archivo de la ruta
             String nombreArchivo = solicitud.getRutaAdjunto().substring(solicitud.getRutaAdjunto().lastIndexOf("/") + 1);
 
             return ResponseEntity.ok()
@@ -272,7 +268,7 @@ public class SolicitudController {
             Resource archivo = ftpStorageService.descargarArchivo(solicitud.getRutaAdjunto());
             String nombreArchivo = solicitud.getRutaAdjunto();
 
-            MediaType contentType = MediaType.APPLICATION_OCTET_STREAM; // Por defecto
+            MediaType contentType = MediaType.APPLICATION_OCTET_STREAM;
             String extension = nombreArchivo.substring(nombreArchivo.lastIndexOf(".") + 1).toLowerCase();
 
             switch (extension) {
@@ -351,19 +347,16 @@ public class SolicitudController {
 
                 solicitudRepo.deleteById(idSolicitud);
 
-                //redirectAttributes.addFlashAttribute("mensaje", "Solicitud eliminada correctamente.");
                 redirectAttributes.addFlashAttribute("msg", "Solicitud eliminada correctamente.");
                 redirectAttributes.addFlashAttribute("tipo", "success");
 
             } else {
-                //redirectAttributes.addFlashAttribute("error", "La solicitud no existe.");
                 redirectAttributes.addFlashAttribute("msg", "La solicitud no existe.");
                 redirectAttributes.addFlashAttribute("tipo", "warning");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            //redirectAttributes.addFlashAttribute("error", "Error al intentar eliminar la solicitud.");
             redirectAttributes.addFlashAttribute("msg", "Error crítico al eliminar.");
             redirectAttributes.addFlashAttribute("tipo", "error");
         }

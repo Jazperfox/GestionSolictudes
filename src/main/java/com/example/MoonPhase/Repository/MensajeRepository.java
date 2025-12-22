@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface MensajeRepository extends JpaRepository<Mensaje, Long> {
 
-    // Buscar chat entre el usuario A y el usuario B (en ambas direcciones)
     @Query("SELECT m FROM Mensaje m WHERE " +
             "(m.remitente.idUsuario = :usuario1 AND m.destinatario.idUsuario = :usuario2) OR " +
             "(m.remitente.idUsuario = :usuario2 AND m.destinatario.idUsuario = :usuario1) " +

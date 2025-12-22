@@ -46,7 +46,6 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        /* Estilo para el input de archivo tipo "Dropzone" */
         .file-upload-wrapper {
             border: 2px dashed #cbd5e0;
             border-radius: 15px;
@@ -138,6 +137,11 @@
         </div>
 
         <div class="mb-3">
+            <label class="form-label">Descripción del Problema:</label>
+            <textarea name="descripcion" class="form-control" rows="4" placeholder="Describa aquí los detalles de su solicitud..." required></textarea>
+        </div>
+
+        <div class="mb-3">
             <label class="form-label">Correo de Notificación:</label>
             <input type="email" name="correo" class="form-control" placeholder="ejemplo@correo.com" required>
         </div>
@@ -162,11 +166,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script th:inline="javascript">
-    /* PARTE 1: Mensajes que vienen del Backend (RedirectAttributes)
-       Cuando la página carga después de guardar, verifica si hay mensajes.
-    */
     const msg = /*[[${msg}]]*/ null;
-    const tipo = /*[[${tipo}]]*/ null; // puede ser 'success' o 'error'
+    const tipo = /*[[${tipo}]]*/ null;
 
     if (msg) {
         Swal.fire({
@@ -183,36 +184,26 @@
         });
     }
 
-    /* PARTE 2: Lógica de Envío (Loading)
-       Esto intercepta el botón guardar para mostrar "Cargando..."
-    */
     const form = document.getElementById('formSolicitud');
 
     form.addEventListener('submit', function(e) {
-        // Validamos que el formulario sea válido antes de mostrar la alerta
         if (!this.checkValidity()) {
-            // Si faltan campos, dejamos que el navegador muestre los errores nativos
             return;
         }
 
-        // Mostramos el SweetAlert de carga
         Swal.fire({
             title: 'Procesando Solicitud',
             text: 'Subiendo archivos y guardando datos, por favor espere...',
             icon: 'info',
-            allowOutsideClick: false, // Evita que cierren la alerta clickeando fuera
+            allowOutsideClick: false,
             allowEscapeKey: false,
-            showConfirmButton: false, // Ocultamos botón para que no puedan cerrarlo
+            showConfirmButton: false,
             didOpen: () => {
-                Swal.showLoading(); // Muestra el spinner girando
+                Swal.showLoading();
             }
         });
-
-        // El formulario se enviará naturalmente después de esto.
-        // Si el backend responde rápido, la página se recargará y la alerta desaparecerá sola.
     });
 
-    /* Extra: Función visual para mostrar el nombre del archivo seleccionado */
     function actualizarNombreArchivo() {
         const input = document.getElementById('inputFile');
         const display = document.getElementById('fileNameDisplay');

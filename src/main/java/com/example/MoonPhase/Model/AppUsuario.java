@@ -12,20 +12,19 @@ import jakarta.persistence.Table;
 public class AppUsuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // ← Cambiar de AUTO a IDENTITY
-    @Column(name = "IdUsuario")  // ← Agregar nombre de columna
-    private Long idUsuario;  // ← Cambiar a camelCase
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "IdUsuario")
+    private Long idUsuario;
     
     @Column(name = "NombreUsuario", length = 100)
-    private String nombreUsuario;  // ← Cambiar a camelCase
+    private String nombreUsuario;
     
     @Column(name = "IdTipoUsuario")
-    private Long idTipoUsuario;  // ← Cambiar a camelCase
+    private Long idTipoUsuario;
     
     @Column(name = "clave", length = 255)
-    private String clave;  // ← Cambiar a camelCase
+    private String clave;
 
-    // Getters
     public Long getIdUsuario() {
         return idUsuario;
     }
@@ -42,7 +41,6 @@ public class AppUsuario {
         return clave;
     }
 
-    // Setters
     public void setIdUsuario(Long idUsuario) {
         this.idUsuario = idUsuario;
     }

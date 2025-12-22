@@ -22,7 +22,6 @@
 
         .main-container { max-width: 1200px; margin: 0 auto; }
 
-        /* HEADER */
         .top-bar {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -49,7 +48,6 @@
         }
         .btn-logout:hover { background-color: #c53030; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3); }
 
-        /* BANNER */
         .dashboard-banner {
             background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
             border-radius: 15px; padding: 2rem; color: white; margin-bottom: 1.5rem;
@@ -61,7 +59,6 @@
         }
         .dashboard-banner h1 { font-size: 1.8rem; margin-bottom: 0.3rem; }
 
-        /* TARJETAS */
         .content-card {
             background: white; border-radius: 15px; padding: 1.5rem; height: 100%;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); transition: transform 0.3s ease;
@@ -71,7 +68,6 @@
         .counter-big { font-size: 3rem; font-weight: 700; color: #3182ce; line-height: 1; }
         .card-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
 
-        /* TABLA */
         .table-custom th {
             background-color: #f7fafc; color: #718096; font-weight: 600;
             text-transform: uppercase; font-size: 0.75rem; padding: 0.8rem; border: none;
@@ -281,10 +277,9 @@
 
 <script>
     $(document).ready(function () {
-        // Inicializar DataTables solo si existe la tabla
         if ($('.table-paginada').length > 0) {
             $('.table-paginada').DataTable({
-                "pageLength": 5, // 5 registros por página para que no se haga muy largo
+                "pageLength": 5,
                 "language": {
                     "lengthMenu": "Mostrar _MENU_",
                     "zeroRecords": "No se encontraron resultados",

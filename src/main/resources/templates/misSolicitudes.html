@@ -18,7 +18,6 @@
         }
 
         body {
-            /* Fondo degradado del tema */
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 2rem;
@@ -30,7 +29,6 @@
             margin: 0 auto;
         }
 
-        /* Tarjeta contenedora principal */
         .card-panel {
             background: white;
             border-radius: 20px;
@@ -44,7 +42,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Encabezado */
         .page-header {
             display: flex;
             justify-content: space-between;
@@ -61,7 +58,6 @@
             font-size: 1.8rem;
         }
 
-        /* Botón Volver */
         .btn-back {
             background-color: #edf2f7;
             color: #4a5568;
@@ -79,7 +75,6 @@
             transform: translateY(-2px);
         }
 
-        /* Tabla personalizada */
         .table-custom {
             width: 100%;
             border-collapse: separate;
@@ -111,7 +106,6 @@
             background-color: #fafbfc;
         }
 
-        /* Estilos de Badges y Botones */
         .fw-bold { font-weight: 600 !important; }
 
         .btn-action-view {
@@ -134,7 +128,6 @@
         }
         .btn-action-delete:hover { background: #fed7d7; color: #9b2c2c; }
 
-        /* Estilos para el modal */
         #previewFrame { width: 100%; height: 500px; border: none; border-radius: 10px; }
         #previewImage { max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 10px; }
 
@@ -293,10 +286,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script th:inline="javascript">
-    /*<![CDATA[*/
-    // 1. Detectar mensajes flash del controlador
     const msg = /*[[${msg}]]*/ null;
-    const tipo = /*[[${tipo}]]*/ null; // success, error, warning, info
+    const tipo = /*[[${tipo}]]*/ null;
 
     if (msg) {
         Swal.fire({
@@ -305,16 +296,14 @@
             icon: tipo || 'info',
             confirmButtonText: 'Entendido',
             confirmButtonColor: '#2575fc',
-            timer: 4000, // Se cierra solo en 4 seg
+            timer: 4000,
             timerProgressBar: true,
             backdrop: `rgba(0,0,0,0.4)`
         });
     }
 
-    // 2. Función genérica para confirmar acciones (ej: Eliminar)
-    // Uso en HTML: onclick="confirmarEliminacion(event, 'formularioEliminarId')"
     function confirmarEliminacion(event, formId) {
-        event.preventDefault(); // Detiene el envío automático
+        event.preventDefault();
 
         Swal.fire({
             title: '¿Estás seguro?',
@@ -327,7 +316,6 @@
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                document.getElementById(formId).submit(); // Envía el formulario manualmente
             }
         });
     }
@@ -342,7 +330,7 @@
 <script>
     $(document).ready(function () {
         $('.table-paginada').DataTable({
-            "pageLength": 10,  // Muestra 10 registros por defecto
+            "pageLength": 10,
             "language": {
                 "lengthMenu": "Mostrar _MENU_ registros por página",
                 "zeroRecords": "No se encontraron resultados",

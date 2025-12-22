@@ -18,7 +18,7 @@
         }
 
         body {
-            /* Fondo degradado */
+
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 2rem;
@@ -30,7 +30,6 @@
             margin: 0 auto;
         }
 
-        /* Tarjeta Principal */
         .card-panel {
             background: white;
             border-radius: 20px;
@@ -44,7 +43,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Encabezado de Página */
         .page-header {
             display: flex;
             justify-content: space-between;
@@ -61,7 +59,6 @@
             font-size: 1.8rem;
         }
 
-        /* Botón Volver */
         .btn-back {
             background-color: #edf2f7;
             color: #4a5568;
@@ -79,7 +76,6 @@
             transform: translateY(-2px);
         }
 
-        /* Tabla Personalizada */
         .table-custom {
             width: 100%;
             border-collapse: separate;
@@ -109,7 +105,6 @@
 
         .fw-bold { font-weight: 600 !important; }
 
-        /* Botones de Acción */
         .btn-action-view {
             color: #3182ce;
             background: #ebf8ff;
@@ -130,7 +125,6 @@
         }
         .btn-action-download:hover { background: #e2e8f0; }
 
-        /* Estilos del Modal */
         #previewFrame { width: 100%; height: 500px; border: none; border-radius: 10px; }
         #previewImage { max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 10px; }
 
@@ -258,7 +252,7 @@
 <script>
     $(document).ready(function () {
         $('.table-paginada').DataTable({
-            "pageLength": 10,  // Muestra 10 registros por defecto
+            "pageLength": 10,
             "language": {
                 "lengthMenu": "Mostrar _MENU_ registros por página",
                 "zeroRecords": "No se encontraron resultados",

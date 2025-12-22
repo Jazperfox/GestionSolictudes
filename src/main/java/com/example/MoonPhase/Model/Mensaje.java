@@ -11,7 +11,7 @@ public class Mensaje {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_mensaje") // <--- CORRECCIÓN IMPORTANTE
+    @Column(name = "id_mensaje")
     private Long idMensaje;
 
     @ManyToOne
@@ -25,13 +25,11 @@ public class Mensaje {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String contenido;
 
-    @Column(name = "fecha_hora") // <--- CORRECCIÓN IMPORTANTE
+    @Column(name = "fecha_hora")
     private LocalDateTime fechaHora;
 
-    // Constructor vacío
     public Mensaje() {}
 
-    // Constructor útil
     public Mensaje(AppUsuario remitente, AppUsuario destinatario, String contenido) {
         this.remitente = remitente;
         this.destinatario = destinatario;

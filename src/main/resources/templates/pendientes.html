@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
 
     <style>
-        /* Estilos Generales del Tema */
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
@@ -17,7 +16,6 @@
             padding-bottom: 2rem;
         }
 
-        /* Encabezado */
         .page-header {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
@@ -28,14 +26,12 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
-        /* Tarjeta Principal */
         .main-card {
             border: none;
             border-radius: 1.5rem;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
-        /* Estilos de la Tabla */
         .table thead th {
             background-color: transparent;
             border-bottom: none;
@@ -62,7 +58,6 @@
             vertical-align: middle;
         }
 
-        /* Avatar circular para el solicitante */
         .avatar-circle {
             width: 35px;
             height: 35px;
@@ -76,7 +71,6 @@
             font-size: 0.9rem;
         }
 
-        /* Badges */
         .priority-badge {
             padding: 0.5em 1em;
             border-radius: 50px;
@@ -87,7 +81,6 @@
         .badge-media { color: #ffc107; background-color: rgba(255, 193, 7, 0.15); }
         .badge-baja { color: #198754; background-color: rgba(25, 135, 84, 0.1); }
 
-        /* Botones de acción */
         .btn-action {
             border-radius: 50px;
             font-weight: 500;
@@ -104,11 +97,9 @@
             background-color: #f8f9fa;
         }
 
-        /* Select y Botón Asignar */
         .form-select.rounded-pill { border-radius: 50px; }
         .btn-assign { border-radius: 50px; font-weight: 600; }
 
-        /* Visor */
         #previewFrame { width: 100%; height: 500px; border: none; }
         #previewImage { max-width: 100%; height: auto; display: block; margin: 0 auto; }
     </style>
@@ -283,9 +274,8 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    // 1. Detectar mensajes flash del controlador
     const msg = /*[[${msg}]]*/ null;
-    const tipo = /*[[${tipo}]]*/ null; // success, error, warning, info
+    const tipo = /*[[${tipo}]]*/ null;
 
     if (msg) {
         Swal.fire({
@@ -300,7 +290,6 @@
         });
     }
 
-    // 2. Función genérica para confirmar acciones
     function confirmarEliminacion(event, formId) {
         event.preventDefault();
         Swal.fire({
@@ -327,7 +316,6 @@
 
 <script>
     $(document).ready(function () {
-        // Solo inicializa DataTables si la tabla existe en el DOM
         if ($('.table-paginada').length > 0) {
             $('.table-paginada').DataTable({
                 "pageLength": 10,
