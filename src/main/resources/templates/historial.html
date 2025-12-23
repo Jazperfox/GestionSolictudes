@@ -10,112 +10,31 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 2rem;
-            color: #2d3748;
-        }
-
-        .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .card-panel {
-            background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #edf2f7;
-            padding-bottom: 1rem;
-        }
-
-        h2 {
-            color: #667eea;
-            font-weight: 700;
-            margin: 0;
-            font-size: 1.8rem;
-        }
-
-        .btn-back {
-            background-color: #edf2f7;
-            color: #4a5568;
-            border: none;
-            padding: 0.5rem 1.2rem;
-            border-radius: 12px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        .btn-back:hover {
-            background-color: #e2e8f0;
-            color: #2d3748;
-            transform: translateY(-2px);
-        }
-
-        .table-custom {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .table-custom thead th {
-            background-color: #f7fafc;
-            color: #718096;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            padding: 1rem;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        .table-custom tbody td {
-            padding: 1rem;
-            border-bottom: 1px solid #edf2f7;
-            vertical-align: middle;
-            font-size: 0.95rem;
-        }
-
-        /* Estilo para filas cliqueables */
-        .clickable-row {
-            transition: background-color 0.2s;
-            cursor: pointer;
-        }
-        .clickable-row:hover {
-            background-color: #f1f5f9 !important;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 2rem; color: #2d3748; }
+        .main-container { max-width: 1200px; margin: 0 auto; }
+        .card-panel { background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 2px solid #edf2f7; padding-bottom: 1rem; }
+        h2 { color: #667eea; font-weight: 700; margin: 0; font-size: 1.8rem; }
+        .btn-back { background-color: #edf2f7; color: #4a5568; border: none; padding: 0.5rem 1.2rem; border-radius: 12px; font-weight: 600; text-decoration: none; transition: all 0.3s; }
+        .btn-back:hover { background-color: #e2e8f0; color: #2d3748; transform: translateY(-2px); }
+        .table-custom { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .table-custom thead th { background-color: #f7fafc; color: #718096; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; padding: 1rem; border-bottom: 2px solid #e2e8f0; }
+        .table-custom tbody td { padding: 1rem; border-bottom: 1px solid #edf2f7; vertical-align: middle; font-size: 0.95rem; }
+        .clickable-row { transition: background-color 0.2s; cursor: pointer; }
+        .clickable-row:hover { background-color: #f1f5f9 !important; }
         .fw-bold { font-weight: 600 !important; }
-
         .modal-content { border-radius: 15px; border: none; }
+
+        /* Estilos para el visor */
+        #previewFrame { width: 100%; height: 500px; border: none; border-radius: 10px; }
+        #previewImage { max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container main-container">
-
     <div class="card-panel">
 
         <div class="page-header">
@@ -137,17 +56,15 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:if="${solicitudes.empty}">
-                    <td colspan="5" class="text-center py-5 text-muted">
-                        <i class="bi bi-clock-history fs-1 d-block mb-3 opacity-50"></i>
-                        No hay historial de solicitudes disponible.
-                    </td>
-                </tr>
-                <tr th:each="sol : ${solicitudes}" class="clickable-row" onclick="abrirDetalle(this, event)">
-                    <input type="hidden" class="data-descripcion" th:value="${sol.descripcion}">
-                    <span class="d-none data-prioridad" th:each="pri : ${prioridades}" th:if="${pri.idPrioridad == sol.idPrioridad}" th:text="${pri.nombrePrioridad}"></span>
 
-                    <td class="text-primary fw-bold data-id" th:text="${'#' + sol.idSolicitud}"></td>
+                <tr th:each="sol : ${solicitudes}" class="clickable-row" onclick="abrirDetalle(this, event)">
+
+                    <td class="text-primary fw-bold data-id">
+                        <span th:text="${'#' + sol.idSolicitud}"></span>
+
+                        <input type="hidden" class="data-descripcion" th:value="${sol.descripcion}">
+                        <input type="hidden" class="data-adjunto" th:value="${sol.rutaAdjunto}"> <span class="d-none data-prioridad" th:each="pri : ${prioridades}" th:if="${pri.idPrioridad == sol.idPrioridad}" th:text="${pri.nombrePrioridad}"></span>
+                    </td>
 
                     <td>
                         <span class="fw-bold text-dark data-categoria" th:each="cat : ${categorias}" th:if="${cat.idCategoria == sol.idCategoriaSolicitud}" th:text="${cat.nombre}"></span>
@@ -202,6 +119,15 @@
                     </div>
                 </div>
 
+                <div class="mb-3" id="mdlAdjuntoContainer" style="display: none;">
+                    <label class="small text-muted fw-bold">Archivo Adjunto</label>
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill" onclick="verAdjuntoDesdeModal()">
+                            <i class="bi bi-paperclip me-2"></i> Ver / Descargar Documento
+                        </button>
+                    </div>
+                </div>
+
                 <div class="mb-3">
                     <label class="small text-muted fw-bold">Resolución Técnica</label>
                     <div id="mdlComentario" class="p-3 bg-light rounded text-secondary border" style="min-height: 40px; border-left: 4px solid #667eea !important;">
@@ -216,28 +142,44 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    function abrirDetalle(row, event) {
-        // Evitar conflictos con clics
-        if (event.target.closest('button') || event.target.closest('a')) {
-            return;
-        }
+<div class="modal fade" id="modalVisualizar" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title fw-bold text-secondary">Vista Previa</h5><button type="button" class="btn-close" onclick="cerrarVistaPrevia()"></button></div>
+            <div class="modal-body text-center bg-light"><img id="previewImage" src="" style="display: none;"><iframe id="previewFrame" src="" style="display: none;"></iframe></div>
+            <div class="modal-footer"><a id="btnDescargarModal" href="#" class="btn btn-primary rounded-pill px-4">Descargar</a><button type="button" class="btn btn-secondary rounded-pill px-4" onclick="cerrarVistaPrevia()">Cerrar</button></div>
+        </div>
+    </div>
+</div>
 
-        // Obtener datos de la fila
-        const id = row.querySelector('.data-id').innerText.replace('#','');
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    // Variables Globales para el adjunto
+    let currentAdjuntoPath = null;
+    let currentSolicitudId = null;
+
+    function abrirDetalle(row, event) {
+        if (event.target.closest('button') || event.target.closest('a')) { return; }
+
+        // Extraer datos
+        const id = row.querySelector('.data-id span').innerText.replace('#','');
         const categoria = row.querySelector('.data-categoria').innerText;
         const fecha = row.querySelector('.data-fecha').innerText;
         const comentario = row.querySelector('.data-comentario').innerText;
-
-        // Obtener datos ocultos
         const descripcion = row.querySelector('.data-descripcion').value;
-        const prioridad = row.querySelector('.data-prioridad') ? row.querySelector('.data-prioridad').innerText : '-';
+        const rutaAdjunto = row.querySelector('.data-adjunto').value; // Leer el input oculto
+        const prioridadSpan = row.querySelector('.data-prioridad');
+        const prioridad = prioridadSpan ? prioridadSpan.innerText : '-';
 
-        // Clonar el badge de estado
-        const estadoBadge = row.querySelector('.data-estado-badge').cloneNode(true);
+        // Guardar en variables globales
+        currentSolicitudId = id;
+        currentAdjuntoPath = rutaAdjunto;
 
-        // Rellenar el modal
+        // Llenar Modal
         document.getElementById('mdlId').innerText = '#' + id;
         document.getElementById('mdlCategoria').innerText = categoria;
         document.getElementById('mdlFecha').innerText = fecha;
@@ -245,40 +187,62 @@
         document.getElementById('mdlDescripcion').innerText = descripcion ? descripcion : 'Sin descripción proporcionada.';
         document.getElementById('mdlComentario').innerText = comentario;
 
-        // Actualizar badge
+        // Clonar Badge
+        const estadoBadge = row.querySelector('.data-estado-badge').cloneNode(true);
         const estadoContainer = document.getElementById('mdlEstado');
         estadoContainer.innerHTML = '';
         estadoContainer.appendChild(estadoBadge);
 
-        // Mostrar Modal
-        const modal = new bootstrap.Modal(document.getElementById('modalDetalle'));
-        modal.show();
+        // Mostrar/Ocultar botón adjunto
+        const adjContainer = document.getElementById('mdlAdjuntoContainer');
+        if (rutaAdjunto && rutaAdjunto.trim() !== '') {
+            adjContainer.style.display = 'block';
+        } else {
+            adjContainer.style.display = 'none';
+        }
+
+        new bootstrap.Modal(document.getElementById('modalDetalle')).show();
     }
-</script>
 
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    // Funciones para previsualizar (igual que en misSolicitudes)
+    function verAdjuntoDesdeModal() {
+        if (!currentAdjuntoPath) return;
+        const p = currentAdjuntoPath.toLowerCase();
+        if (p.endsWith('.jpg') || p.endsWith('.png') || p.endsWith('.pdf')) {
+            cargarPrevisualizacion(currentSolicitudId, !p.endsWith('.pdf'));
+            new bootstrap.Modal(document.getElementById('modalVisualizar')).show();
+        } else {
+            window.location.href = '/solicitud/descargar/' + currentSolicitudId;
+        }
+    }
 
-<script>
+    function cargarPrevisualizacion(id, esImagen) {
+        const urlVer = '/solicitud/ver-archivo/' + id;
+        document.getElementById('btnDescargarModal').href = '/solicitud/descargar/' + id;
+        const img = document.getElementById('previewImage');
+        const frame = document.getElementById('previewFrame');
+
+        img.style.display = 'none'; frame.style.display = 'none';
+        if(esImagen) { img.src = urlVer; img.style.display = 'block'; }
+        else { frame.src = urlVer; frame.style.display = 'block'; }
+    }
+
+    function cerrarVistaPrevia() {
+        const el = document.getElementById('modalVisualizar');
+        const modal = bootstrap.Modal.getInstance(el);
+        if(modal) modal.hide();
+        document.getElementById('previewImage').src = "";
+        document.getElementById('previewFrame').src = "";
+    }
+
     $(document).ready(function () {
         if ($('.table-paginada').length > 0) {
             $('.table-paginada').DataTable({
                 "pageLength": 10,
-                "order": [], // Respetar orden del backend
+                "order": [],
                 "language": {
-                    "lengthMenu": "Mostrar _MENU_ registros por página",
-                    "zeroRecords": "No se encontraron resultados",
-                    "info": "Mostrando página _PAGE_ de _PAGES_",
-                    "infoEmpty": "No hay registros disponibles",
-                    "infoFiltered": "(filtrado de _MAX_ registros totales)",
-                    "search": "Buscar:",
-                    "paginate": {
-                        "first": "Primero",
-                        "last": "Último",
-                        "next": "Siguiente",
-                        "previous": "Anterior"
-                    }
+                    "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json",
+                    "emptyTable": "No hay historial de solicitudes disponible."
                 }
             });
         }

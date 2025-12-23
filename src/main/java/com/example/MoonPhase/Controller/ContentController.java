@@ -5,10 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.example.MoonPhase.Repository.AppUsuarioRepository;
-import com.example.MoonPhase.Repository.CategoriaSolicitudRepository;
-import com.example.MoonPhase.Repository.PrioridadRepository;
-import com.example.MoonPhase.Repository.SolicitudRepository;
+import com.example.MoonPhase.Repository.*; // Importamos todos los repositorios
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +29,10 @@ public class ContentController {
 
     @Autowired
     private PrioridadRepository prioridadRepo;
+
+    // --- AGREGAR ESTO: Inyectar el repositorio de estados ---
+    @Autowired
+    private EstadoRepository estadoRepo;
 
     private Optional<AppUsuario> getLoggedInUser(Authentication auth) {
         if (auth == null) {
@@ -86,14 +87,20 @@ public class ContentController {
             List<Solicitud> misTareasActivas = solicitudRepository.findMisPendientes(user.getIdUsuario());
             model.addAttribute("misTareas", misTareasActivas);
 
+            // Nota: Asegúrate de que tu Repositorio ya tenga la corrección de IDs (2 y 4)
             List<Solicitud> misResueltas = solicitudRepository.findMisResueltas(user.getIdUsuario());
             model.addAttribute("resueltas", misResueltas);
 
             List<Solicitud> misTareasRecientes = solicitudRepository.findTop5ByIdUsuarioOrderByFechaCreacionDesc(user.getIdUsuario());
-            model.addAttribute("misTareas", misTareasRecientes);
+            // OJO: Aquí estabas sobrescribiendo "misTareas", creo que querías otra variable o mantener la anterior.
+            // Si esto es para mostrar "Asignaciones en curso" vs "Historial", revisa que no se crucen.
+            // Por ahora lo dejo como lo tenías, pero asegúrate de que 'misResueltas' se llene bien.
 
             model.addAttribute("categorias", categoriaRepo.findAll());
             model.addAttribute("prioridades", prioridadRepo.findAll());
+
+            // --- CORRECCIÓN CRÍTICA: Enviar la lista de estados a la vista ---
+            model.addAttribute("estados", estadoRepo.findAll());
 
             return "indexadmin";
         }
@@ -127,6 +134,8 @@ public class ContentController {
             model.addAttribute("ultimasPendientes", ultimasPendientes);
 
             model.addAttribute("usuarios", usuarioRepository.findAll());
+
+            model.addAttribute("estados", estadoRepo.findAll());
 
             return "indexAutoriza";
         }

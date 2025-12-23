@@ -11,76 +11,23 @@
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 1.5rem;
-            color: #2d3748;
-            font-size: 0.9rem;
-        }
-
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 1.5rem; color: #2d3748; font-size: 0.9rem; }
         .main-container { max-width: 1200px; margin: 0 auto; }
-
-        .top-bar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 0.8rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            margin-bottom: 1.5rem;
-        }
-
-        .user-badge {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; margin-right: 0.8rem;
-        }
-
-        .btn-logout {
-            background-color: #f56565; color: white; border: none;
-            padding: 0.5rem 1.2rem; border-radius: 10px; font-weight: 600;
-            font-size: 0.85rem; transition: all 0.3s ease;
-        }
+        .top-bar { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 15px; padding: 0.8rem 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 1.5rem; }
+        .user-badge { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-right: 0.8rem; }
+        .btn-logout { background-color: #f56565; color: white; border: none; padding: 0.5rem 1.2rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem; transition: all 0.3s ease; }
         .btn-logout:hover { background-color: #c53030; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3); }
-
-        .dashboard-banner {
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px; padding: 2rem; color: white; margin-bottom: 1.5rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1); position: relative; overflow: hidden;
-        }
-        .dashboard-banner::after {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at top right, rgba(255,255,255,0.1), transparent);
-        }
+        .dashboard-banner { background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 15px; padding: 2rem; color: white; margin-bottom: 1.5rem; box-shadow: 0 8px 20px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
+        .dashboard-banner::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at top right, rgba(255,255,255,0.1), transparent); }
         .dashboard-banner h1 { font-size: 1.8rem; margin-bottom: 0.3rem; }
-
-        .content-card {
-            background: white; border-radius: 15px; padding: 1.5rem; height: 100%;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); transition: transform 0.3s ease;
-        }
+        .content-card { background: white; border-radius: 15px; padding: 1.5rem; height: 100%; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); transition: transform 0.3s ease; }
         .content-card:hover { transform: translateY(-3px); }
-
         .counter-big { font-size: 3rem; font-weight: 700; color: #3182ce; line-height: 1; }
         .card-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
-
-        .table-custom th {
-            background-color: #f7fafc; color: #718096; font-weight: 600;
-            text-transform: uppercase; font-size: 0.75rem; padding: 0.8rem; border: none;
-        }
+        .table-custom th { background-color: #f7fafc; color: #718096; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; padding: 0.8rem; border: none; }
         .table-custom td { border-bottom: 1px solid #edf2f7; padding: 0.8rem; font-size: 0.85rem; }
-
-        .btn-action {
-            background: white; border: 2px solid #3182ce; color: #3182ce;
-            border-radius: 10px; padding: 0.4rem 1rem; font-weight: 600;
-            text-decoration: none; display: inline-block; transition: all 0.3s; font-size: 0.9rem;
-        }
+        .btn-action { background: white; border: 2px solid #3182ce; color: #3182ce; border-radius: 10px; padding: 0.4rem 1rem; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.3s; font-size: 0.9rem; }
         .btn-action:hover { background: #3182ce; color: white; }
-
         footer { text-align: center; color: rgba(255,255,255,0.8); margin-top: 2rem; font-size: 0.8rem; }
     </style>
 </head>
@@ -90,29 +37,15 @@
 
     <div class="top-bar">
         <div class="d-flex align-items-center">
-            <div class="user-badge">
-                <i class="bi bi-tools"></i>
-            </div>
+            <div class="user-badge"><i class="bi bi-tools"></i></div>
             <div>
                 <h2 class="h6 mb-0 fw-bold">¡Hola, <span th:text="${nombreUsuario}">Admin</span>!</h2>
                 <small class="text-muted" style="font-size: 0.8rem;">Usuario: <span th:text="${nombreUsuario}">Nombre</span> | Rol: Técnico Admin</small>
             </div>
         </div>
-
         <div class="d-flex align-items-center gap-2">
-            <a href="/mensajes" class="btn btn-light rounded-circle text-primary border d-flex align-items-center justify-content-center shadow-sm"
-               style="width: 40px; height: 40px; color: #3182ce !important; transition: transform 0.2s;"
-               onmouseover="this.style.transform='scale(1.1)'"
-               onmouseout="this.style.transform='scale(1)'"
-               title="Mensajería Interna">
-                <i class="bi bi-chat-text-fill"></i>
-            </a>
-
-            <form th:action="@{/logout}" method="post" class="m-0">
-                <button type="submit" class="btn-logout">
-                    Cerrar Sesión
-                </button>
-            </form>
+            <a href="/mensajes" class="btn btn-light rounded-circle text-primary border d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; color: #3182ce !important;" title="Mensajería Interna"><i class="bi bi-chat-text-fill"></i></a>
+            <form th:action="@{/logout}" method="post" class="m-0"><button type="submit" class="btn-logout">Cerrar Sesión</button></form>
         </div>
     </div>
 
@@ -122,72 +55,37 @@
     </div>
 
     <div class="row g-3 mb-4">
-
         <div class="col-md-4">
             <div class="content-card text-center d-flex flex-column justify-content-center align-items-center h-100">
-                <div class="mb-3 text-primary card-icon">
-                    <i class="bi bi-briefcase-fill"></i>
-                </div>
+                <div class="mb-3 text-primary card-icon"><i class="bi bi-briefcase-fill"></i></div>
                 <h3 class="h6 text-muted mb-1">En Proceso</h3>
                 <div class="counter-big mb-2" th:text="${tareasPendientes}">0</div>
                 <p class="text-muted mb-4 small">Solicitudes bajo tu gestión actual</p>
-
-                <a href="/solicitud/autorizar" class="btn-action w-100">
-                    <i class="bi bi-play-circle-fill"></i> Gestionar Pendientes
-                </a>
+                <a href="/solicitud/autorizar" class="btn-action w-100"><i class="bi bi-play-circle-fill"></i> Gestionar Pendientes</a>
             </div>
         </div>
 
         <div class="col-md-8">
             <div class="content-card h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h3 class="h6 fw-bold mb-0 text-primary">
-                        <i class="bi bi-hourglass-split me-2"></i>Asignaciones En Curso
-                    </h3>
+                    <h3 class="h6 fw-bold mb-0 text-primary"><i class="bi bi-hourglass-split me-2"></i>Asignaciones En Curso</h3>
                     <span class="badge bg-light text-primary border">Prioridad</span>
                 </div>
-
                 <div class="table-responsive">
                     <table class="table table-custom align-middle mb-0">
                         <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Categoría</th>
-                            <th>Fecha Asignación</th>
-                            <th>Prioridad</th>
-                            <th class="text-end">Acción</th>
+                            <th>ID</th><th>Categoría</th><th>Fecha Asignación</th><th>Prioridad</th><th class="text-end">Acción</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:if="${misTareas.empty}">
-                            <td colspan="5" class="text-center py-4 text-muted small">
-                                <i class="bi bi-check-circle fs-4 d-block mb-2"></i>
-                                ¡Todo limpio! No tienes tareas pendientes.
-                            </td>
-                        </tr>
+                        <tr th:if="${misTareas.empty}"><td colspan="5" class="text-center py-4 text-muted small"><i class="bi bi-check-circle fs-4 d-block mb-2"></i>¡Todo limpio! No tienes tareas pendientes.</td></tr>
                         <tr th:each="sol : ${misTareas}">
                             <td class="fw-bold text-primary" th:text="${'#' + sol.idSolicitud}">#</td>
-
-                            <td>
-                                <span th:each="cat : ${categorias}"
-                                      th:if="${cat.idCategoria == sol.idCategoriaSolicitud}"
-                                      th:text="${cat.nombre}" class="fw-bold text-dark"></span>
-                            </td>
-
+                            <td><span th:each="cat : ${categorias}" th:if="${cat.idCategoria == sol.idCategoriaSolicitud}" th:text="${cat.nombre}" class="fw-bold text-dark"></span></td>
                             <td th:text="${sol.fechaCreacion}">Fecha</td>
-
-                            <td>
-                                <span th:each="pri : ${prioridades}" th:if="${pri.idPrioridad == sol.idPrioridad}"
-                                      th:text="${pri.nombrePrioridad}"
-                                      th:classappend="${pri.nombrePrioridad == 'Alta' ? 'text-danger fw-bold small' : 'text-success fw-bold small'}">
-                                </span>
-                            </td>
-
-                            <td class="text-end">
-                                <a href="/solicitud/autorizar" class="btn btn-sm btn-primary rounded-pill px-3 py-0" style="font-size: 0.8rem;">
-                                    Gestionar
-                                </a>
-                            </td>
+                            <td><span th:each="pri : ${prioridades}" th:if="${pri.idPrioridad == sol.idPrioridad}" th:text="${pri.nombrePrioridad}" th:classappend="${pri.nombrePrioridad == 'Alta' ? 'text-danger fw-bold small' : 'text-success fw-bold small'}"></span></td>
+                            <td class="text-end"><a href="/solicitud/autorizar" class="btn btn-sm btn-primary rounded-pill px-3 py-0" style="font-size: 0.8rem;">Gestionar</a></td>
                         </tr>
                         </tbody>
                     </table>
@@ -200,21 +98,14 @@
         <div class="col-12">
             <div class="content-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h3 class="h6 fw-bold mb-0 text-secondary">
-                        <i class="bi bi-archive-fill me-2"></i>Historial de Resoluciones (Aprobadas / Negadas)
-                    </h3>
+                    <h3 class="h6 fw-bold mb-0 text-secondary"><i class="bi bi-archive-fill me-2"></i>Historial de Resoluciones (Aprobadas / Negadas)</h3>
                 </div>
 
                 <div class="table-responsive">
                     <table class="table table-custom align-middle mb-0 table-paginada">
                         <thead class="bg-light">
                         <tr>
-                            <th>ID</th>
-                            <th>Categoría</th>
-                            <th>Fecha</th>
-                            <th>Estado Final</th>
-                            <th>Comentario</th>
-                            <th class="text-end">Detalles</th>
+                            <th>ID</th><th>Categoría</th><th>Fecha</th><th>Estado Final</th><th>Comentario</th><th class="text-end">Detalles</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -223,39 +114,24 @@
                         </tr>
                         <tr th:each="res : ${resueltas}">
                             <td class="text-secondary fw-bold" th:text="${'#' + res.idSolicitud}">#</td>
-
-                            <td>
-                                <span th:each="cat : ${categorias}"
-                                      th:if="${cat.idCategoria == res.idCategoriaSolicitud}"
-                                      th:text="${cat.nombre}"></span>
-                            </td>
-
+                            <td><span th:each="cat : ${categorias}" th:if="${cat.idCategoria == res.idCategoriaSolicitud}" th:text="${cat.nombre}"></span></td>
                             <td th:text="${res.fechaCreacion}" class="text-muted small"></td>
 
                             <td>
-                                <span th:each="est : ${estados}"
-                                      th:if="${est.idEstado == res.idEstadoSolicitud}">
+                                <span th:each="est : ${estados}" th:if="${est.idEstado == res.idEstadoSolicitud}">
 
-                                    <span th:if="${est.idEstado == 4}"
-                                          class="badge bg-success bg-opacity-10 text-success border border-success px-3">
+                                    <span th:if="${est.idEstado == 2}" class="badge bg-success bg-opacity-10 text-success border border-success px-3">
                                         <i class="bi bi-check-circle-fill me-1"></i> Aprobada
                                     </span>
 
-                                    <span th:if="${est.idEstado == 5}"
-                                          class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3">
+                                    <span th:if="${est.idEstado == 4}" class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3">
                                         <i class="bi bi-x-circle-fill me-1"></i> Negada
                                     </span>
                                 </span>
                             </td>
 
-                            <td class="small text-muted fst-italic text-truncate" style="max-width: 200px;"
-                                th:text="${res.comentario != null ? res.comentario : '-'}"></td>
-
-                            <td class="text-end">
-                                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" disabled>
-                                    Cerrado
-                                </button>
-                            </td>
+                            <td class="small text-muted fst-italic text-truncate" style="max-width: 200px;" th:text="${res.comentario != null ? res.comentario : '-'}"></td>
+                            <td class="text-end"><button class="btn btn-sm btn-outline-secondary rounded-pill px-3" disabled>Cerrado</button></td>
                         </tr>
                         </tbody>
                     </table>
@@ -264,40 +140,22 @@
         </div>
     </div>
 
-    <footer>
-        <p>© 2025 Proyecto UTEC - Universidad Tecnológica</p>
-    </footer>
-
+    <footer><p>© 2025 Proyecto UTEC - Universidad Tecnológica</p></footer>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-
 <script>
     $(document).ready(function () {
         if ($('.table-paginada').length > 0) {
             $('.table-paginada').DataTable({
                 "pageLength": 5,
-                "language": {
-                    "lengthMenu": "Mostrar _MENU_",
-                    "zeroRecords": "No se encontraron resultados",
-                    "info": "Pág _PAGE_ de _PAGES_",
-                    "infoEmpty": "Sin datos",
-                    "infoFiltered": "(filtrado de _MAX_)",
-                    "search": "Buscar:",
-                    "paginate": {
-                        "first": "Inicio",
-                        "last": "Fin",
-                        "next": "Sig",
-                        "previous": "Ant"
-                    }
-                }
+                "language": { "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json" }
             });
         }
     });
 </script>
-
 </body>
 </html>
