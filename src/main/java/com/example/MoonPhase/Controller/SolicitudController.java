@@ -126,8 +126,14 @@ public class SolicitudController {
         List<Solicitud> pendientes = solicitudRepo.findSolicitudesNoAsignadasJPQL();
         List<AppUsuario> usuarios = usuarioRepo.findByIdTipoUsuario(1L);
 
+        // --- AGREGADO: Cargar listas para traducir IDs a Nombres en la vista ---
+        List<Categoria> categorias = categoriaRepo.findAll();
+        List<Prioridad> prioridades = prioridadRepo.findAll();
+
         model.addAttribute("pendientes", pendientes);
         model.addAttribute("usuarios", usuarios);
+        model.addAttribute("categorias", categorias); // Nuevo
+        model.addAttribute("prioridades", prioridades); // Nuevo
 
         return "pendientes";
     }

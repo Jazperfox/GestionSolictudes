@@ -13,10 +13,10 @@ import java.util.List;
 @Repository
 public interface SolicitudRepository extends JpaRepository<Solicitud, Long> {
 
-    @Query("SELECT s FROM Solicitud s WHERE s.idUsuario IS NULL")
+    @Query("SELECT s FROM Solicitud s WHERE s.idUsuario IS NULL ORDER BY s.idSolicitud DESC")
     List<Solicitud> findSolicitudesNoAsignadasJPQL();
 
-    @Query("SELECT s FROM Solicitud s WHERE s.idUsuario = :idUsuario AND s.idEstadoSolicitud = 3")
+    @Query("SELECT s FROM Solicitud s WHERE s.idUsuario = :idUsuario AND s.idEstadoSolicitud = 3 ORDER BY s.idSolicitud DESC")
     List<Solicitud> findSolicitudesAAutorizar(@Param("idUsuario") Long idUsuario);
 
     @Query("SELECT s FROM Solicitud s WHERE s.idUsuario = :idUsuario AND s.idEstadoSolicitud = 3 ORDER BY s.fechaCreacion ASC")
@@ -25,10 +25,11 @@ public interface SolicitudRepository extends JpaRepository<Solicitud, Long> {
     @Query("SELECT s FROM Solicitud s WHERE s.idUsuario = :idUsuario AND s.idEstadoSolicitud IN (4, 5) ORDER BY s.fechaCreacion DESC")
     List<Solicitud> findMisResueltas(@Param("idUsuario") Long idUsuario);
 
-    @Query("SELECT s FROM Solicitud s WHERE s.idUsuarioCreacion = :idUsuario AND s.idEstadoSolicitud IN (1, 3)")
+    @Query("SELECT s FROM Solicitud s WHERE s.idUsuarioCreacion = :idUsuario AND s.idEstadoSolicitud IN (1, 3) ORDER BY s.idSolicitud DESC")
     List<Solicitud> findMisSolicitudesActivas(@Param("idUsuario") Long idUsuario);
 
-    @Query("SELECT s FROM Solicitud s WHERE s.idUsuarioCreacion = :idUsuario AND s.idEstadoSolicitud IN (2, 4, 5)")
+    // MODIFICADO: Agregado ORDER BY para el Historial
+    @Query("SELECT s FROM Solicitud s WHERE s.idUsuarioCreacion = :idUsuario AND s.idEstadoSolicitud IN (2, 4, 5) ORDER BY s.idSolicitud DESC")
     List<Solicitud> findMisSolicitudesHistorial(@Param("idUsuario") Long idUsuario);
 
     long countByIdUsuarioIsNull();

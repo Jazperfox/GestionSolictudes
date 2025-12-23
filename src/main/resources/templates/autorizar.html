@@ -135,6 +135,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Categoría</th>
+                    <th>Descripción</th>
                     <th>Creador</th>
                     <th>Fecha</th> <th>Estado</th> <th>Prioridad</th> <th class="text-center">Adjunto</th>
                     <th class="text-center">Acciones</th>
@@ -146,6 +147,10 @@
 
                     <td>
                         <span class="fw-bold text-dark" th:each="cat : ${categorias}" th:if="${cat.idCategoria == solicitud.idCategoriaSolicitud}" th:text="${cat.nombre}"></span>
+                    </td>
+
+                    <td class="text-muted small">
+                        <div th:text="${#strings.abbreviate(solicitud.descripcion, 40)}" title="Ver detalle completo en gestionar"></div>
                     </td>
 
                     <td>
@@ -200,7 +205,9 @@
                                 data-bs-target="#modalActualizar"
                                 th:attr="data-id=${solicitud.idSolicitud},
                                          data-cat-nombre=${categorias.^[idCategoria == __${solicitud.idCategoriaSolicitud}__]?.nombre ?: 'Sin Categoría'},
-                                         data-est-nombre=${estados.^[idEstado == __${solicitud.idEstadoSolicitud}__]?.estado ?: 'Sin Estado'}">
+                                         data-est-nombre=${estados.^[idEstado == __${solicitud.idEstadoSolicitud}__]?.estado ?: 'Sin Estado'},
+                                         data-desc=${solicitud.descripcion},
+                                         data-adjunto=${solicitud.rutaAdjunto != null ? solicitud.rutaAdjunto : ''}">
                             <i class="bi bi-pencil-square me-1"></i> Gestionar
                         </button>
                     </td>
@@ -211,12 +218,12 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalVisualizar" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalVisualizar" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title fw-bold text-secondary">Vista Previa</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" onclick="cerrarVistaPrevia()"></button>
             </div>
             <div class="modal-body text-center bg-light">
                 <img id="previewImage" src="" style="display: none;">
@@ -225,7 +232,7 @@
             </div>
             <div class="modal-footer">
                 <a id="btnDescargarModal" href="#" class="btn btn-primary rounded-pill px-4">Descargar</a>
-                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary rounded-pill px-4" onclick="cerrarVistaPrevia()">Cerrar</button>
             </div>
         </div>
     </div>
@@ -246,6 +253,21 @@
                         <label class="form-label text-secondary fw-bold small">Categoría</label>
                         <input type="text" id="modalCategoriaVisible" class="form-control bg-light" readonly>
                     </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary fw-bold small">Descripción del Problema</label>
+                        <textarea id="modalDescripcion" class="form-control bg-light" rows="3" readonly></textarea>
+                    </div>
+
+                    <div class="mb-3" id="modalAdjuntoContainer" style="display: none;">
+                        <label class="form-label text-secondary fw-bold small">Archivo de Soporte</label>
+                        <div class="d-grid">
+                            <button type="button" class="btn btn-outline-info rounded-pill" onclick="verAdjuntoDesdeGestion()">
+                                <i class="bi bi-paperclip me-2"></i> Ver / Descargar Adjunto
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label text-secondary fw-bold small">Estado Actual</label>
                         <input type="text" id="modalNombreEstado" class="form-control bg-light mb-2" readonly>
@@ -259,8 +281,8 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label text-secondary fw-bold small">Comentario</label>
-                        <textarea name="comentario" class="form-control" rows="4"></textarea>
+                        <label class="form-label text-secondary fw-bold small">Comentario de Resolución</label>
+                        <textarea name="comentario" class="form-control" rows="3" placeholder="Escriba la solución o razón del rechazo..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer bg-light">
@@ -292,7 +314,6 @@
 </script>
 
 <script>
-    // Variables globales
     const tbody = document.getElementById('cuerpoTabla');
     let filasOriginales = Array.from(document.querySelectorAll('.fila-dato'));
 
@@ -316,7 +337,8 @@
             });
         } else {
             filasVisibles.sort((a, b) => {
-                return parseInt(a.cells[0].textContent.replace('#','')) - parseInt(b.cells[0].textContent.replace('#',''));
+                // Orden descendente por ID
+                return parseInt(b.cells[0].textContent.replace('#','')) - parseInt(a.cells[0].textContent.replace('#',''));
             });
         }
 
@@ -331,7 +353,7 @@
                 if (valorGrupo !== grupoActual) {
                     const trHeader = document.createElement('tr');
                     trHeader.className = 'group-header';
-                    trHeader.innerHTML = `<td colspan="8"><i class="bi bi-caret-down-fill me-2"></i>${criterioAgrupacion.toUpperCase()}: ${valorGrupo}</td>`;
+                    trHeader.innerHTML = `<td colspan="9"><i class="bi bi-caret-down-fill me-2"></i>${criterioAgrupacion.toUpperCase()}: ${valorGrupo}</td>`;
                     tbody.appendChild(trHeader);
                     grupoActual = valorGrupo;
                 }
@@ -347,7 +369,10 @@
         return '';
     }
 
-    // Scripts de Modales
+    // --- VARIABLES PARA MANEJAR ADJUNTO EN MODAL ---
+    let currentAdjuntoPath = "";
+    let currentSolicitudId = "";
+
     const modalAct = document.getElementById('modalActualizar');
     if(modalAct){
         modalAct.addEventListener('show.bs.modal', event => {
@@ -356,12 +381,46 @@
             const idSolicitud = button.getAttribute('data-id');
             const nombreCategoria = button.getAttribute('data-cat-nombre');
             const nombreEstado = button.getAttribute('data-est-nombre');
+            const descripcion = button.getAttribute('data-desc');
+            const rutaAdjunto = button.getAttribute('data-adjunto'); // Obtenemos la ruta
 
-            // 2. Asignar valores a los inputs del Modal
             document.getElementById('modalIdSolicitud').value = idSolicitud;
             document.getElementById('modalCategoriaVisible').value = nombreCategoria;
             document.getElementById('modalNombreEstado').value = nombreEstado;
+            document.getElementById('modalDescripcion').value = descripcion ? descripcion : 'Sin descripción';
+
+            // Guardamos valores globales para usar al dar clic en "Ver Adjunto"
+            currentSolicitudId = idSolicitud;
+            currentAdjuntoPath = rutaAdjunto;
+
+            // Mostrar u ocultar el botón del adjunto
+            const adjuntoContainer = document.getElementById('modalAdjuntoContainer');
+            if (rutaAdjunto && rutaAdjunto.trim() !== '') {
+                adjuntoContainer.style.display = 'block';
+            } else {
+                adjuntoContainer.style.display = 'none';
+            }
         });
+    }
+
+    // Función llamada desde el botón dentro del modal "Gestionar"
+    function verAdjuntoDesdeGestion() {
+        if (!currentAdjuntoPath) return;
+
+        const pathLower = currentAdjuntoPath.toLowerCase();
+        const esImagen = pathLower.endsWith('.jpg') || pathLower.endsWith('.jpeg') || pathLower.endsWith('.png');
+        const esPdf = pathLower.endsWith('.pdf');
+
+        if (esImagen || esPdf) {
+            // Reutilizamos la función de previsualización
+            cargarPrevisualizacion(currentSolicitudId, esImagen);
+            // Abrimos el modal de visualización (Bootstrap 5)
+            const visualModal = new bootstrap.Modal(document.getElementById('modalVisualizar'));
+            visualModal.show();
+        } else {
+            // Descargar directo
+            window.location.href = '/solicitud/descargar/' + currentSolicitudId;
+        }
     }
 
     function cargarPrevisualizacion(id, esImagen) {
@@ -381,6 +440,17 @@
             frame.src = urlVer;
             loading.style.display = 'none'; frame.style.display = 'block';
         }
+    }
+
+    function cerrarVistaPrevia() {
+        // Cierra manualmente el modal de visualización
+        const el = document.getElementById('modalVisualizar');
+        const modal = bootstrap.Modal.getInstance(el);
+        if(modal) modal.hide();
+
+        // Limpia sources
+        document.getElementById('previewImage').src = "";
+        document.getElementById('previewFrame').src = "";
     }
 
     aplicarLogicaTabla();

@@ -211,6 +211,12 @@
         }
         .btn-send:hover { background: #5a67d8; transform: scale(1.05); }
 
+        .btn-send:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .empty-chat {
             height: 100%;
             display: flex;
@@ -290,10 +296,10 @@
             </div>
 
             <div class="input-area">
-                <form th:action="@{/mensajes/enviar}" method="post" class="input-group-chat">
+                <form id="formChat" th:action="@{/mensajes/enviar}" method="post" class="input-group-chat">
                     <input type="hidden" name="idDestinatario" th:value="${chatSeleccionado.idUsuario}">
                     <input type="text" name="contenido" class="input-chat" placeholder="Escribe tu mensaje aquí..." required autocomplete="off" autofocus>
-                    <button type="submit" class="btn-send">
+                    <button type="submit" class="btn-send" id="btnEnviar">
                         <i class="bi bi-send-fill"></i>
                     </button>
                 </form>
@@ -332,6 +338,23 @@
                 a[i].style.display = "none";
             }
         }
+    }
+
+    const formChat = document.getElementById('formChat');
+
+    if(formChat) {
+        formChat.addEventListener('submit', function(e) {
+            const input = this.querySelector('input[name="contenido"]');
+            const btn = document.getElementById('btnEnviar');
+
+            if (!input.value.trim()) {
+                e.preventDefault();
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        });
     }
 </script>
 

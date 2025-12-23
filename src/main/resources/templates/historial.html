@@ -18,7 +18,6 @@
         }
 
         body {
-
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 2rem;
@@ -99,38 +98,18 @@
             font-size: 0.95rem;
         }
 
-        .table-custom tbody tr:hover {
-            background-color: #fafbfc;
+        /* Estilo para filas cliqueables */
+        .clickable-row {
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .clickable-row:hover {
+            background-color: #f1f5f9 !important;
         }
 
         .fw-bold { font-weight: 600 !important; }
 
-        .btn-action-view {
-            color: #3182ce;
-            background: #ebf8ff;
-            border: none;
-            border-radius: 8px;
-            padding: 5px 10px;
-            transition: 0.2s;
-        }
-        .btn-action-view:hover { background: #bee3f8; color: #2c5282; }
-
-        .btn-action-download {
-            color: #2d3748;
-            background: #edf2f7;
-            border: none;
-            border-radius: 8px;
-            padding: 5px 10px;
-            transition: 0.2s;
-        }
-        .btn-action-download:hover { background: #e2e8f0; }
-
-        #previewFrame { width: 100%; height: 500px; border: none; border-radius: 10px; }
-        #previewImage { max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 10px; }
-
         .modal-content { border-radius: 15px; border: none; }
-        .modal-header { border-bottom: 1px solid #edf2f7; }
-        .modal-footer { border-top: 1px solid #edf2f7; }
     </style>
 </head>
 <body>
@@ -147,7 +126,7 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-custom">
+            <table class="table table-custom table-paginada">
                 <thead>
                 <tr>
                     <th>ID</th>
@@ -155,54 +134,36 @@
                     <th>Fecha</th>
                     <th>Resolución</th>
                     <th>Comentario Técnico</th>
-                    <th class="text-center">Adjunto</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:if="${solicitudes.empty}">
-                    <td colspan="6" class="text-center py-5 text-muted">
+                    <td colspan="5" class="text-center py-5 text-muted">
                         <i class="bi bi-clock-history fs-1 d-block mb-3 opacity-50"></i>
                         No hay historial de solicitudes disponible.
                     </td>
                 </tr>
-                <tr th:each="sol : ${solicitudes}">
-                    <td class="text-primary fw-bold" th:text="${'#' + sol.idSolicitud}"></td>
+                <tr th:each="sol : ${solicitudes}" class="clickable-row" onclick="abrirDetalle(this, event)">
+                    <input type="hidden" class="data-descripcion" th:value="${sol.descripcion}">
+                    <span class="d-none data-prioridad" th:each="pri : ${prioridades}" th:if="${pri.idPrioridad == sol.idPrioridad}" th:text="${pri.nombrePrioridad}"></span>
+
+                    <td class="text-primary fw-bold data-id" th:text="${'#' + sol.idSolicitud}"></td>
 
                     <td>
-                        <span class="fw-bold text-dark" th:each="cat : ${categorias}" th:if="${cat.idCategoria == sol.idCategoriaSolicitud}" th:text="${cat.nombre}"></span>
+                        <span class="fw-bold text-dark data-categoria" th:each="cat : ${categorias}" th:if="${cat.idCategoria == sol.idCategoriaSolicitud}" th:text="${cat.nombre}"></span>
                     </td>
 
-                    <td class="text-muted" th:text="${sol.fechaCreacion}"></td>
+                    <td class="text-muted data-fecha" th:text="${sol.fechaCreacion}"></td>
 
                     <td>
-                        <span class="badge rounded-pill" th:each="est : ${estados}" th:if="${est.idEstado == sol.idEstadoSolicitud}"
+                        <span class="badge rounded-pill data-estado-badge" th:each="est : ${estados}" th:if="${est.idEstado == sol.idEstadoSolicitud}"
                               th:text="${est.estado}"
                               th:classappend="${est.estado == 'APROBADA' ? 'bg-success' : 'bg-danger'}">
                         </span>
                     </td>
 
-                    <td class="text-muted fst-italic" th:text="${sol.comentario != null ? sol.comentario : 'Sin comentarios'}"></td>
-
-                    <td class="text-center">
-                        <div th:if="${sol.rutaAdjunto != null and !sol.rutaAdjunto.isEmpty()}"
-                             th:with="ruta=${sol.rutaAdjunto.toLowerCase()},
-                                      esImagen=${#strings.endsWith(ruta, '.jpg') or #strings.endsWith(ruta, '.png')},
-                                      esPdf=${#strings.endsWith(ruta, '.pdf')}">
-
-                            <button th:if="${esImagen or esPdf}" type="button" class="btn-action-view"
-                                    data-bs-toggle="modal" data-bs-target="#modalVisualizar"
-                                    th:onclick="cargarPrevisualizacion([[${sol.idSolicitud}]], [[${esImagen}]])"
-                                    title="Ver Archivo">
-                                <i class="bi bi-eye-fill"></i>
-                            </button>
-
-                            <a th:unless="${esImagen or esPdf}" th:href="@{/solicitud/descargar/{id}(id=${sol.idSolicitud})}"
-                               class="btn-action-download" title="Descargar">
-                                <i class="bi bi-download"></i>
-                            </a>
-                        </div>
-                        <span th:unless="${sol.rutaAdjunto != null}" class="text-muted small">-</span>
-                    </td>
+                    <td class="text-muted fst-italic text-truncate data-comentario" style="max-width: 250px;"
+                        th:text="${sol.comentario != null ? sol.comentario : 'Sin comentarios'}"></td>
                 </tr>
                 </tbody>
             </table>
@@ -210,22 +171,46 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalVisualizar" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+<div class="modal fade" id="modalDetalle" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold text-secondary">Vista Previa</h5>
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold text-primary">Detalle de Solicitud <span id="mdlId"></span></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body text-center bg-light">
-                <img id="previewImage" src="" style="display: none;">
-                <iframe id="previewFrame" src="" style="display: none;"></iframe>
+            <div class="modal-body p-4">
+                <div class="d-flex justify-content-between mb-3">
+                    <span id="mdlEstado" class="badge bg-secondary fs-6">Estado</span>
+                    <span id="mdlFecha" class="text-muted small">Fecha</span>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="small text-muted fw-bold">Categoría</label>
+                        <div id="mdlCategoria" class="text-dark fw-semibold">Cat</div>
+                    </div>
+                    <div class="col-6">
+                        <label class="small text-muted fw-bold">Prioridad</label>
+                        <div id="mdlPrioridad" class="text-dark fw-semibold">Alta</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="small text-muted fw-bold">Descripción del Usuario</label>
+                    <div id="mdlDescripcion" class="p-3 bg-light rounded text-secondary border" style="min-height: 60px;">
+                        Sin descripción.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="small text-muted fw-bold">Resolución Técnica</label>
+                    <div id="mdlComentario" class="p-3 bg-light rounded text-secondary border" style="min-height: 40px; border-left: 4px solid #667eea !important;">
+                        Sin resolución.
+                    </div>
+                </div>
             </div>
-            <div class="modal-footer">
-                <a id="btnDescargarModal" href="#" class="btn btn-primary rounded-pill px-4">
-                    <i class="bi bi-download me-1"></i> Descargar
-                </a>
-                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary rounded-pill px-4 w-100" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
@@ -233,15 +218,41 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    function cargarPrevisualizacion(id, esImagen) {
-        const urlVer = '/solicitud/ver-archivo/' + id;
-        const urlDown = '/solicitud/descargar/' + id;
-        document.getElementById('btnDescargarModal').href = urlDown;
-        const img = document.getElementById('previewImage');
-        const frame = document.getElementById('previewFrame');
-        img.style.display = 'none'; frame.style.display = 'none';
-        if(esImagen) { img.src = urlVer; img.style.display = 'block'; }
-        else { frame.src = urlVer; frame.style.display = 'block'; }
+    function abrirDetalle(row, event) {
+        // Evitar conflictos con clics
+        if (event.target.closest('button') || event.target.closest('a')) {
+            return;
+        }
+
+        // Obtener datos de la fila
+        const id = row.querySelector('.data-id').innerText.replace('#','');
+        const categoria = row.querySelector('.data-categoria').innerText;
+        const fecha = row.querySelector('.data-fecha').innerText;
+        const comentario = row.querySelector('.data-comentario').innerText;
+
+        // Obtener datos ocultos
+        const descripcion = row.querySelector('.data-descripcion').value;
+        const prioridad = row.querySelector('.data-prioridad') ? row.querySelector('.data-prioridad').innerText : '-';
+
+        // Clonar el badge de estado
+        const estadoBadge = row.querySelector('.data-estado-badge').cloneNode(true);
+
+        // Rellenar el modal
+        document.getElementById('mdlId').innerText = '#' + id;
+        document.getElementById('mdlCategoria').innerText = categoria;
+        document.getElementById('mdlFecha').innerText = fecha;
+        document.getElementById('mdlPrioridad').innerText = prioridad;
+        document.getElementById('mdlDescripcion').innerText = descripcion ? descripcion : 'Sin descripción proporcionada.';
+        document.getElementById('mdlComentario').innerText = comentario;
+
+        // Actualizar badge
+        const estadoContainer = document.getElementById('mdlEstado');
+        estadoContainer.innerHTML = '';
+        estadoContainer.appendChild(estadoBadge);
+
+        // Mostrar Modal
+        const modal = new bootstrap.Modal(document.getElementById('modalDetalle'));
+        modal.show();
     }
 </script>
 
@@ -251,23 +262,26 @@
 
 <script>
     $(document).ready(function () {
-        $('.table-paginada').DataTable({
-            "pageLength": 10,
-            "language": {
-                "lengthMenu": "Mostrar _MENU_ registros por página",
-                "zeroRecords": "No se encontraron resultados",
-                "info": "Mostrando página _PAGE_ de _PAGES_",
-                "infoEmpty": "No hay registros disponibles",
-                "infoFiltered": "(filtrado de _MAX_ registros totales)",
-                "search": "Buscar:",
-                "paginate": {
-                    "first": "Primero",
-                    "last": "Último",
-                    "next": "Siguiente",
-                    "previous": "Anterior"
+        if ($('.table-paginada').length > 0) {
+            $('.table-paginada').DataTable({
+                "pageLength": 10,
+                "order": [], // Respetar orden del backend
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ registros por página",
+                    "zeroRecords": "No se encontraron resultados",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay registros disponibles",
+                    "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
                 }
-            }
-        });
+            });
+        }
     });
 </script>
 

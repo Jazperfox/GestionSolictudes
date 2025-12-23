@@ -98,25 +98,20 @@
             font-size: 0.95rem;
         }
 
-        .table-custom tbody tr:last-child td {
-            border-bottom: none;
-        }
-
         .table-custom tbody tr:hover {
             background-color: #fafbfc;
         }
 
-        .fw-bold { font-weight: 600 !important; }
-
-        .btn-action-view {
-            color: #3182ce;
-            background: #ebf8ff;
-            border: none;
-            border-radius: 8px;
-            padding: 5px 10px;
-            transition: 0.2s;
+        /* Fila cliqueable */
+        .clickable-row {
+            transition: background-color 0.2s;
+            cursor: pointer;
         }
-        .btn-action-view:hover { background: #bee3f8; color: #2c5282; }
+        .clickable-row:hover {
+            background-color: #f1f5f9 !important;
+        }
+
+        .fw-bold { font-weight: 600 !important; }
 
         .btn-action-delete {
             color: #e53e3e;
@@ -128,12 +123,10 @@
         }
         .btn-action-delete:hover { background: #fed7d7; color: #9b2c2c; }
 
+        /* Modal Styles */
         #previewFrame { width: 100%; height: 500px; border: none; border-radius: 10px; }
         #previewImage { max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 10px; }
-
         .modal-content { border-radius: 15px; border: none; }
-        .modal-header { border-bottom: 1px solid #edf2f7; }
-        .modal-footer { border-top: 1px solid #edf2f7; }
     </style>
 </head>
 <body>
@@ -167,28 +160,33 @@
                     <th>Fecha</th>
                     <th>Estado</th>
                     <th>Prioridad</th>
-                    <th class="text-center">Adjunto</th>
                     <th class="text-center">Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:if="${solicitudes.empty}">
-                    <td colspan="7" class="text-center py-5 text-muted">
+                    <td colspan="6" class="text-center py-5 text-muted">
                         <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
                         No tienes solicitudes activas en este momento.
                     </td>
                 </tr>
-                <tr th:each="sol : ${solicitudes}">
-                    <td class="text-primary fw-bold" th:text="${'#' + sol.idSolicitud}"></td>
+                <tr th:each="sol : ${solicitudes}" class="clickable-row" onclick="abrirDetalle(this, event)">
+                    <input type="hidden" class="data-descripcion" th:value="${sol.descripcion}">
+                    <span class="d-none data-prioridad" th:each="pri : ${prioridades}" th:if="${pri.idPrioridad == sol.idPrioridad}" th:text="${pri.nombrePrioridad}"></span>
+
+                    <input type="hidden" class="data-comentario" th:value="${sol.comentario}">
+                    <input type="hidden" class="data-adjunto" th:value="${sol.rutaAdjunto}">
+
+                    <td class="text-primary fw-bold data-id" th:text="${'#' + sol.idSolicitud}"></td>
 
                     <td>
-                        <span class="fw-bold text-dark" th:each="cat : ${categorias}" th:if="${cat.idCategoria == sol.idCategoriaSolicitud}" th:text="${cat.nombre}"></span>
+                        <span class="fw-bold text-dark data-categoria" th:each="cat : ${categorias}" th:if="${cat.idCategoria == sol.idCategoriaSolicitud}" th:text="${cat.nombre}"></span>
                     </td>
 
-                    <td class="text-muted" th:text="${sol.fechaCreacion}"></td>
+                    <td class="text-muted data-fecha" th:text="${sol.fechaCreacion}"></td>
 
                     <td>
-                        <span class="badge rounded-pill" th:each="est : ${estados}" th:if="${est.idEstado == sol.idEstadoSolicitud}"
+                        <span class="badge rounded-pill data-estado-badge" th:each="est : ${estados}" th:if="${est.idEstado == sol.idEstadoSolicitud}"
                               th:text="${est.estado}"
                               th:classappend="${est.estado == 'CREADO' ? 'bg-info text-dark' : 'bg-warning text-dark'}">
                         </span>
@@ -199,27 +197,6 @@
                               th:text="${pri.nombrePrioridad}"
                               th:classappend="${pri.nombrePrioridad == 'Alta' ? 'text-danger fw-bold' : (pri.nombrePrioridad == 'Media' ? 'text-warning fw-bold' : 'text-success fw-bold')}">
                         </span>
-                    </td>
-
-                    <td class="text-center">
-                        <div th:if="${sol.rutaAdjunto != null and !sol.rutaAdjunto.isEmpty()}"
-                             th:with="ruta=${sol.rutaAdjunto.toLowerCase()},
-                                      esImagen=${#strings.endsWith(ruta, '.jpg') or #strings.endsWith(ruta, '.png')},
-                                      esPdf=${#strings.endsWith(ruta, '.pdf')}">
-
-                            <button th:if="${esImagen or esPdf}" type="button" class="btn-action-view"
-                                    data-bs-toggle="modal" data-bs-target="#modalVisualizar"
-                                    th:onclick="cargarPrevisualizacion([[${sol.idSolicitud}]], [[${esImagen}]])"
-                                    title="Ver Archivo">
-                                <i class="bi bi-eye-fill"></i>
-                            </button>
-
-                            <a th:unless="${esImagen or esPdf}" th:href="@{/solicitud/descargar/{id}(id=${sol.idSolicitud})}"
-                               class="btn-action-view" title="Descargar">
-                                <i class="bi bi-download"></i>
-                            </a>
-                        </div>
-                        <span th:unless="${sol.rutaAdjunto != null}" class="text-muted small">-</span>
                     </td>
 
                     <td class="text-center">
@@ -247,12 +224,66 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalVisualizar" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalDetalle" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold text-primary">Detalle de Solicitud <span id="mdlId"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="d-flex justify-content-between mb-3">
+                    <span id="mdlEstado" class="badge bg-secondary fs-6">Estado</span>
+                    <span id="mdlFecha" class="text-muted small">Fecha</span>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="small text-muted fw-bold">Categoría</label>
+                        <div id="mdlCategoria" class="text-dark fw-semibold">Cat</div>
+                    </div>
+                    <div class="col-6">
+                        <label class="small text-muted fw-bold">Prioridad</label>
+                        <div id="mdlPrioridad" class="text-dark fw-semibold">Alta</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="small text-muted fw-bold">Tu Descripción</label>
+                    <div id="mdlDescripcion" class="p-3 bg-light rounded text-secondary border" style="min-height: 60px;">
+                        Sin descripción.
+                    </div>
+                </div>
+
+                <div class="mb-3" id="mdlAdjuntoContainer" style="display: none;">
+                    <label class="small text-muted fw-bold">Archivo Adjunto</label>
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill" onclick="verAdjuntoDesdeModal()">
+                            <i class="bi bi-paperclip me-2"></i> Ver / Descargar Documento
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="small text-muted fw-bold">Estado / Comentario Técnico</label>
+                    <div id="mdlComentario" class="p-3 bg-light rounded text-secondary border" style="min-height: 40px; border-left: 4px solid #667eea !important;">
+                        Aún no hay comentarios técnicos.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary rounded-pill px-4 w-100" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalVisualizar" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title fw-bold text-secondary">Vista Previa</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" onclick="cerrarVistaPrevia()"></button>
             </div>
             <div class="modal-body text-center bg-light">
                 <img id="previewImage" src="" style="display: none;">
@@ -262,28 +293,17 @@
                 <a id="btnDescargarModal" href="#" class="btn btn-primary rounded-pill px-4">
                     <i class="bi bi-download me-1"></i> Descargar
                 </a>
-                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary rounded-pill px-4" onclick="cerrarVistaPrevia()">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    function cargarPrevisualizacion(id, esImagen) {
-        const urlVer = '/solicitud/ver-archivo/' + id;
-        const urlDown = '/solicitud/descargar/' + id;
-        document.getElementById('btnDescargarModal').href = urlDown;
-        const img = document.getElementById('previewImage');
-        const frame = document.getElementById('previewFrame');
-        img.style.display = 'none'; frame.style.display = 'none';
-        if(esImagen) { img.src = urlVer; img.style.display = 'block'; }
-        else { frame.src = urlVer; frame.style.display = 'block'; }
-    }
-</script>
-
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 
 <script th:inline="javascript">
     const msg = /*[[${msg}]]*/ null;
@@ -302,8 +322,107 @@
         });
     }
 
+    // --- VARIABLES GLOBALES PARA ADJUNTO ---
+    let currentAdjuntoPath = null;
+    let currentSolicitudId = null;
+
+    // Función principal para abrir el detalle
+    function abrirDetalle(row, event) {
+        // Evitar que se abra si hacemos clic en el botón eliminar
+        if (event.target.closest('button') || event.target.closest('form')) {
+            return;
+        }
+
+        // 1. Obtener datos visibles
+        const id = row.querySelector('.data-id').innerText.replace('#','');
+        const categoria = row.querySelector('.data-categoria').innerText;
+        const fecha = row.querySelector('.data-fecha').innerText;
+
+        // 2. Obtener datos ocultos
+        const descripcion = row.querySelector('.data-descripcion').value;
+        const comentario = row.querySelector('.data-comentario').value;
+        const prioridad = row.querySelector('.data-prioridad') ? row.querySelector('.data-prioridad').innerText : '-';
+        const rutaAdjunto = row.querySelector('.data-adjunto').value;
+
+        // 3. Guardar datos globales para el visor
+        currentSolicitudId = id;
+        currentAdjuntoPath = rutaAdjunto;
+
+        // 4. Llenar Modal
+        document.getElementById('mdlId').innerText = '#' + id;
+        document.getElementById('mdlCategoria').innerText = categoria;
+        document.getElementById('mdlFecha').innerText = fecha;
+        document.getElementById('mdlPrioridad').innerText = prioridad;
+        document.getElementById('mdlDescripcion').innerText = descripcion ? descripcion : 'Sin descripción.';
+        document.getElementById('mdlComentario').innerText = (comentario && comentario !== 'null') ? comentario : 'Solicitud en curso, esperando revisión técnica.';
+
+        // Badge de estado
+        const estadoBadge = row.querySelector('.data-estado-badge').cloneNode(true);
+        const estadoContainer = document.getElementById('mdlEstado');
+        estadoContainer.innerHTML = '';
+        estadoContainer.appendChild(estadoBadge);
+
+        // 5. Mostrar/Ocultar sección de adjunto
+        const adjContainer = document.getElementById('mdlAdjuntoContainer');
+        if (rutaAdjunto && rutaAdjunto.trim() !== '') {
+            adjContainer.style.display = 'block';
+        } else {
+            adjContainer.style.display = 'none';
+        }
+
+        // Mostrar Modal
+        const modal = new bootstrap.Modal(document.getElementById('modalDetalle'));
+        modal.show();
+    }
+
+    // Función para el botón dentro del modal
+    function verAdjuntoDesdeModal() {
+        if (!currentAdjuntoPath) return;
+
+        const pathLower = currentAdjuntoPath.toLowerCase();
+        const esImagen = pathLower.endsWith('.jpg') || pathLower.endsWith('.jpeg') || pathLower.endsWith('.png');
+        const esPdf = pathLower.endsWith('.pdf');
+
+        if (esImagen || esPdf) {
+            cargarPrevisualizacion(currentSolicitudId, esImagen);
+            const visualModal = new bootstrap.Modal(document.getElementById('modalVisualizar'));
+            visualModal.show();
+        } else {
+            // Descarga directa
+            window.location.href = '/solicitud/descargar/' + currentSolicitudId;
+        }
+    }
+
+    // Función de carga de previsualización (reutilizada)
+    function cargarPrevisualizacion(id, esImagen) {
+        const urlVer = '/solicitud/ver-archivo/' + id;
+        const urlDown = '/solicitud/descargar/' + id;
+        document.getElementById('btnDescargarModal').href = urlDown;
+        const img = document.getElementById('previewImage');
+        const frame = document.getElementById('previewFrame');
+
+        img.style.display = 'none'; frame.style.display = 'none';
+
+        if(esImagen) {
+            img.src = urlVer;
+            img.style.display = 'block';
+        } else {
+            frame.src = urlVer;
+            frame.style.display = 'block';
+        }
+    }
+
+    function cerrarVistaPrevia() {
+        const el = document.getElementById('modalVisualizar');
+        const modal = bootstrap.Modal.getInstance(el);
+        if(modal) modal.hide();
+        document.getElementById('previewImage').src = "";
+        document.getElementById('previewFrame').src = "";
+    }
+
     function confirmarEliminacion(event, formId) {
         event.preventDefault();
+        event.stopPropagation(); // Importante para no abrir el detalle
 
         Swal.fire({
             title: '¿Estás seguro?',
@@ -316,36 +435,27 @@
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
+                document.getElementById(formId).submit();
             }
         });
     }
-    /*]]>*/
-</script>
 
-
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-
-<script>
     $(document).ready(function () {
-        $('.table-paginada').DataTable({
-            "pageLength": 10,
-            "language": {
-                "lengthMenu": "Mostrar _MENU_ registros por página",
-                "zeroRecords": "No se encontraron resultados",
-                "info": "Mostrando página _PAGE_ de _PAGES_",
-                "infoEmpty": "No hay registros disponibles",
-                "infoFiltered": "(filtrado de _MAX_ registros totales)",
-                "search": "Buscar:",
-                "paginate": {
-                    "first": "Primero",
-                    "last": "Último",
-                    "next": "Siguiente",
-                    "previous": "Anterior"
+        if ($('.table-paginada').length > 0) {
+            $('.table-paginada').DataTable({
+                "pageLength": 10,
+                "order": [],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ registros",
+                    "zeroRecords": "No se encontraron resultados",
+                    "info": "Página _PAGE_ de _PAGES_",
+                    "infoEmpty": "Sin datos",
+                    "infoFiltered": "(filtrado de _MAX_)",
+                    "search": "Buscar:",
+                    "paginate": { "first": "Inicio", "last": "Fin", "next": "Sig", "previous": "Ant" }
                 }
-            }
-        });
+            });
+        }
     });
 </script>
 
